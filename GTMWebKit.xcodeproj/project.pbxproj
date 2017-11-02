@@ -32,6 +32,10 @@
 		26712C711FAABF3900AC3255 /* LBXScanWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26712C6A1FAABF3800AC3255 /* LBXScanWrapper.swift */; };
 		26712C731FAABFC100AC3255 /* BarcodeScanable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26712C721FAABFC100AC3255 /* BarcodeScanable.swift */; };
 		26712C751FAAC03200AC3255 /* ScanViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26712C741FAAC03200AC3255 /* ScanViewController.swift */; };
+		26712C7B1FAAE8D600AC3255 /* GTMWebKit.podspec in Resources */ = {isa = PBXBuildFile; fileRef = 26712C781FAAE8D500AC3255 /* GTMWebKit.podspec */; };
+		26712C7C1FAAE8D600AC3255 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 26712C791FAAE8D500AC3255 /* LICENSE */; };
+		26712C7D1FAAE8D600AC3255 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 26712C7A1FAAE8D500AC3255 /* README.md */; };
+		26712C7F1FAAEE2C00AC3255 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 26712C7E1FAAEE2B00AC3255 /* logo.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -88,6 +92,10 @@
 		26712C6A1FAABF3800AC3255 /* LBXScanWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LBXScanWrapper.swift; sourceTree = "<group>"; };
 		26712C721FAABFC100AC3255 /* BarcodeScanable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BarcodeScanable.swift; sourceTree = "<group>"; };
 		26712C741FAAC03200AC3255 /* ScanViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanViewController.swift; sourceTree = "<group>"; };
+		26712C781FAAE8D500AC3255 /* GTMWebKit.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GTMWebKit.podspec; sourceTree = "<group>"; };
+		26712C791FAAE8D500AC3255 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		26712C7A1FAAE8D500AC3255 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		26712C7E1FAAEE2B00AC3255 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = logo.png; path = GTMWebKitExample/Assets.xcassets/Logo.imageset/logo.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,6 +120,10 @@
 		2657A38F1FA9939300A717A3 = {
 			isa = PBXGroup;
 			children = (
+				26712C7E1FAAEE2B00AC3255 /* logo.png */,
+				26712C781FAAE8D500AC3255 /* GTMWebKit.podspec */,
+				26712C791FAAE8D500AC3255 /* LICENSE */,
+				26712C7A1FAAE8D500AC3255 /* README.md */,
 				2657A39B1FA9939300A717A3 /* GTMWebKit */,
 				2657A3B71FA993EA00A717A3 /* GTMWebKitExample */,
 				2657A39A1FA9939300A717A3 /* Products */,
@@ -309,7 +321,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26712C7C1FAAE8D600AC3255 /* LICENSE in Resources */,
 				2657A3C91FA994BE00A717A3 /* test.html in Resources */,
+				26712C7B1FAAE8D600AC3255 /* GTMWebKit.podspec in Resources */,
+				26712C7F1FAAEE2C00AC3255 /* logo.png in Resources */,
+				26712C7D1FAAE8D600AC3255 /* README.md in Resources */,
 				2657A3C31FA993EA00A717A3 /* LaunchScreen.storyboard in Resources */,
 				2657A3C01FA993EA00A717A3 /* Assets.xcassets in Resources */,
 				2657A3BE1FA993EA00A717A3 /* Main.storyboard in Resources */,
