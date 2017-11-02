@@ -31,25 +31,24 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
     public var isShowCloseItem = true   // 是否显示关闭按钮（navigType == .navbar 时使用）
     public var isShowToolbar = true     // 是否显示工具栏（navigType == .toolbar 时使用）
     
-    // MARK: - private props
-    private var webUrl: URL?
+    public var webUrl: URL?
     /// 网页加载进度指示器
-    private var progressView: UIProgressView?
+    public var progressView: UIProgressView?
     
-    private var navigType: GTMWK_NavigationType! // 控制网页导航的方式（导航栏，工具栏）
+    var navigType: GTMWK_NavigationType! // 控制网页导航的方式（导航栏，工具栏）
     // MARK: Navigation Items
-    private var navbarItemBack: UIBarButtonItem?
-    private var navbarItemClose: UIBarButtonItem?
+    var navbarItemBack: UIBarButtonItem?
+    var navbarItemClose: UIBarButtonItem?
     // MARK: ToolBar Items
-    private var toolbarItemBack: UIBarButtonItem?
-    private var toolbarItemForward: UIBarButtonItem?
-    private var toolbarItemRefresh: UIBarButtonItem?
-    private var toolbarItemAction: UIBarButtonItem?
+    var toolbarItemBack: UIBarButtonItem?
+    var toolbarItemForward: UIBarButtonItem?
+    var toolbarItemRefresh: UIBarButtonItem?
+    var toolbarItemAction: UIBarButtonItem?
     
     /// 弱代理（处理内存泄漏的问题）
-    private var weakScriptHandler: WeakScriptMessageHandler!
+    var weakScriptHandler: WeakScriptMessageHandler!
     /// 提供给JS的API容器
-    private var scriptHandlers: [String: (_ body: Any?) -> Void] = [:]
+    var scriptHandlers: [String: (_ body: Any?) -> Void] = [:]
     
     // MARK: - Life Cycle
     
@@ -371,7 +370,7 @@ extension GTMWebViewController {
         if let navigationC = self.navigationController {
             if navigationC.isBeingPresented {
                 let doneButtonItem = UIBarButtonItem.init(barButtonSystemItem: .done, target: self, action: #selector(onNavigationDone))
-                doneButtonItem.setTitleTextAttributes([.font: UIFont.systemFont(ofSize: 15)], for: .normal)
+                doneButtonItem.setTitleTextAttributes([NSAttributedStringKey.font: UIFont.systemFont(ofSize: 15)], for: .normal)
                 self.navigationItem.rightBarButtonItem = doneButtonItem
             }
         }

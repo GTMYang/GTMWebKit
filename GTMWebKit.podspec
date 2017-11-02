@@ -13,11 +13,11 @@ Pod::Spec.new do |s|
 
 
   s.source       = { :git => "https://github.com/GTMYang/GTMWebKit.git", :tag => s.version }
-  s.source_files = "GTMWebKit/*.{h,swift}"
-  s.resources    = 'GTMWebKit/*.{bundle,png}'
+  s.source_files = 'GTMWebKit/*.{h,swift}'
+  s.resources    = 'GTMWebKit/GTMWebKit.bundle'
 
-  s.ios.deployment_target = "8.0"
-  s.frameworks = "UIKit","Foundation","WebKit"
+  s.ios.deployment_target = '8.0'
+  s.frameworks = 'UIKit','Foundation','WebKit'
 
   s.pod_target_xcconfig = { 'SWIFT_VERSION' => '3.0' }
 
