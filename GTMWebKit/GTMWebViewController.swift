@@ -139,10 +139,10 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
             fatalError("GTMWebKit ----->没有为GTMWebViewController提供网页的URL")
         }
         
-        self.loadUrl(url: url)
+        self.loadWithUrl(url: url)
     }
     
-    public func loadUrl(url: URL) {
+    public func loadWithUrl(url: URL) {
         webView?.load(URLRequest.init(url: url))
     }
     
