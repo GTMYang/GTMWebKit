@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>iOS and Js</title>
+        <style type="text/css">
+            * {
+                font-size: 40px;
+            }
+            .button {
+                width: 600px; height: 120px;
+            }
+        </style>
+    </head>
+    
+    <body style="margin: 60px">
+        
+        <div style="margin: 20px">
+            <h1>Test how to use swift call js</h1><br/>
+            <div><input class="button" type="button" value="调用 js alert" onclick="callJsAlert()"></div><br/>
+            <div><input class="button" type="button" value="调用 js confirm" onclick="callJsConfirm()"></div><br/>
+        </div>
+        <br/>
+        <div style="margin: 20px">
+            <div><input type="button" value="调用 Js prompt " onclick="callJsInput()" class="button"></div><br/>
+            <div><input type="button" value="调用原生条码扫描" onclick="callBarcodeScan()" class="button"></div><br/>
+            <div><input type="button" value="js 向 swift 传送消息" onclick="sendMessageToNative()" class="button"></div><br/>
+            <div>Click me here: <a href="https://www.baidu.com" class="button">跳转到百度</a></div>
+        </div>
+        
+        <br/>
+        <div id="SwiftDiv" style="margin-top: -20px; background-color: orange; height: 120px; padding: 20px;">
+            <span id="jsParamFuncSpan" style="color: blue; font-size: 50px;"></span>
+        </div>
+        
+        <script type="text/javascript">
+            
+        function callJsAlert() {
+            alert('swift call js to show alert');
+        }
+        
+        function callJsConfirm() {
+            if (confirm('confirm', 'swift call js to show confirm')) {
+                document.getElementById('jsParamFuncSpan').innerHTML
+                = 'true';
+            } else {
+                document.getElementById('jsParamFuncSpan').innerHTML
+                = 'false';
+            }
+        }
+        
+        function callJsInput() {
+            var response = prompt('Hello', 'Please input your name:');
+            document.getElementById('jsParamFuncSpan').innerHTML = response;
+        }
+        
+        function changeColor() {
+            var curColor = document.getElementById('SwiftDiv').style.backgroundColor;
+            if(curColor == "orange") {
+                document.getElementById('SwiftDiv').style.backgroundColor = "green";
+            } else if(curColor == "green") {
+                document.getElementById('SwiftDiv').style.backgroundColor = "gray";
+            } else {
+                document.getElementById('SwiftDiv').style.backgroundColor = "orange";
+            }
+        }
+        
+        // 调用test API
+        function sendMessageToNative() {
+            window.webkit.messageHandlers.GTMWebKitAPI.postMessage({method:'test', body: 'js message to native swift code'});
+        }
+        // 调用扫描API
+        function callBarcodeScan() {
+            window.webkit.messageHandlers.GTMWebKitAPI.postMessage({method:'scanBarcode', body: ''});
+        }
+        
+        // 注意哦，如果JS写错，可能在OC调用JS方法时，都会出错哦。
+        var jsParamFunc = function(argument) {
+            document.getElementById('jsParamFuncSpan').innerHTML
+            = argument['name'];
+        }
+        //showAlert();
+            </script>
+    </body>
+</html>

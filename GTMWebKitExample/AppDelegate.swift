@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  GTMWebKitExample
 //
-//  Created by luoyang on 2017/11/1.
+//  Created by luoyang on 2017/10/25.
 //  Copyright © 2017年 yang. All rights reserved.
 //
 
@@ -16,6 +16,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        UINavigationBar.appearance().tintColor = UIColor.gray
+        
         return true
     }
 

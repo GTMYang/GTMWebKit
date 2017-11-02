@@ -6,10 +6,13 @@
 //  Copyright © 2017年 syncsoft. All rights reserved.
 //
 
-import Foundation
-import swiftScan
+import UIKit
 
-protocol BarcodeScanable: OlliixScanViewControllerDelegate {
+protocol ScanViewControllerDelegate: class {
+    func onScanSuccess(barcode: String)
+}
+
+protocol BarcodeScanable: ScanViewControllerDelegate {
     func startScanBarcode(viewTitle: String)
 }
 
@@ -38,10 +41,9 @@ extension BarcodeScanable where Self: UIViewController {
         //离左边和右边距离
         style.xScanRetangleOffset = 30
         
-        let scanViewController = OlliixScanViewController()
+        let scanViewController = ScanViewController()
         scanViewController.title = viewTitle
         
-        scanViewController.scanFor = .product
         scanViewController.delegate = self
         
         scanViewController.scanStyle = style

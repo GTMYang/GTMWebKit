@@ -14,7 +14,7 @@ public enum GTMWK_NavigationType {
     case toolbar    // web导航控制按钮放在底部工具栏
 }
 
-public class GTMWebViewController: UIViewController, GTMAlertable {
+open class GTMWebViewController: UIViewController, GTMAlertable {
     
     let GTMWK_404_NOT_FOUND_RELOAD_URL = "gtmwk_404_not_found"
     let GTMWK_NET_ERROR_RELOAD_URL = "gtmwk_network_error"
@@ -28,15 +28,15 @@ public class GTMWebViewController: UIViewController, GTMAlertable {
     
     // MARK: - public props
     public var webView: WKWebView?
-    public var isShowCloseItem = true
-    public var isShowToolbar = true
+    public var isShowCloseItem = true   // 是否显示关闭按钮（navigType == .navbar 时使用）
+    public var isShowToolbar = true     // 是否显示工具栏（navigType == .toolbar 时使用）
     
     // MARK: - private props
     private var webUrl: URL?
     /// 网页加载进度指示器
     private var progressView: UIProgressView?
     
-    private var navigType: GTMWK_NavigationType!
+    private var navigType: GTMWK_NavigationType! // 控制网页导航的方式（导航栏，工具栏）
     // MARK: Navigation Items
     private var navbarItemBack: UIBarButtonItem?
     private var navbarItemClose: UIBarButtonItem?
@@ -63,14 +63,14 @@ public class GTMWebViewController: UIViewController, GTMAlertable {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override public func viewDidLoad() {
+    override open func viewDidLoad() {
         super.viewDidLoad()
 
         self.setup()
         self.load()     // 加载网页
     }
     
-    public override func viewWillAppear(_ animated: Bool) {
+    override open func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         if self.isShowToolbar && self.navigType == .toolbar {
@@ -79,7 +79,7 @@ public class GTMWebViewController: UIViewController, GTMAlertable {
         self.updateButtonItems() // 更新导航按钮状态
     }
     
-    public override func viewWillDisappear(_ animated: Bool) {
+    override open func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         self.navigationController?.setToolbarHidden(true, animated: animated)
     }
@@ -95,6 +95,7 @@ public class GTMWebViewController: UIViewController, GTMAlertable {
         configuration.preferences.javaScriptEnabled = true
         configuration.allowsInlineMediaPlayback = true  // 允许视频播放回退
         configuration.userContentController = WKUserContentController()     // 交互对象
+        configuration.userContentController.add(self.weakScriptHandler, name: "GTMWebKitAPI")
         self.webView = WKWebView(frame: self.view.bounds, configuration: configuration)     // WKWebView
         self.webView?.uiDelegate = self
         self.webView?.navigationDelegate = self
@@ -107,7 +108,7 @@ public class GTMWebViewController: UIViewController, GTMAlertable {
         let top = self.navigationController?.navigationBar.bounds.size.height ?? 0
         self.progressView?.frame.origin.y = top > 0 ? top + CGFloat(20) : 0
         self.progressView?.trackTintColor = UIColor.white
-        self.progressView?.tintColor = UIColor.orange
+        self.progressView?.tintColor = UIColor.gray
         self.view.addSubview(self.progressView!)
         
         // add observers
@@ -124,11 +125,9 @@ public class GTMWebViewController: UIViewController, GTMAlertable {
     
     // MARK: - Public
     /// 注册API
-    public func registApi(for name: String, with handler: @escaping (_ body: Any?) -> Void) {
+    public func registApi(method methodName: String, with handler: @escaping (_ body: Any?) -> Void) {
         // 添加到容器
-        self.scriptHandlers[name] = handler
-        // 注册
-        self.webView?.configuration.userContentController.add(self.weakScriptHandler, name: name)
+        self.scriptHandlers[methodName] = handler
     }
     /// 注入JS
     public func injectUserScript(script: WKUserScript) {
@@ -153,8 +152,16 @@ public class GTMWebViewController: UIViewController, GTMAlertable {
 extension GTMWebViewController: WKScriptMessageHandler {
     
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        if let handler = self.scriptHandlers[message.name] {
-            handler(message.body)
+        if message.name == "GTMWebKitAPI" {
+            if let body = message.body as? Dictionary<String, Any> {
+                let method = body["method"] as! String
+                print("\(body)")
+                print("\(method)")
+                
+                if let handler = self.scriptHandlers[method] {
+                    handler(body["body"])
+                }
+            }
         }
     }
 }
@@ -175,7 +182,7 @@ extension GTMWebViewController: WKNavigationDelegate {
     }
     
     // MARK: - KVO
-    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+    override open func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == "loading" {
             print("GTMWebKit ----->loading")
         } else if keyPath == "title" {
@@ -229,7 +236,6 @@ extension GTMWebViewController: WKNavigationDelegate {
     // MARK: Permitting Navigation
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         
-//        print("GTMWebKit ----->\(navigationAction.request.url?.absoluteString ?? "")\n")
         // Disable all the '_blank' target in page's target
         if let frame = navigationAction.targetFrame {
             if frame.isMainFrame {
@@ -326,7 +332,8 @@ extension GTMWebViewController {
         }
         let buttonBack = UIButton.init(type: .custom)
         buttonBack.setImage(iconBack, for: .normal)
-        buttonBack.sizeToFit()
+        buttonBack.imageEdgeInsets = UIEdgeInsets(top: 8, left: -8, bottom: 8, right: 24)
+//        buttonBack.sizeToFit()
         
         if navigType == .navbar {
             // back item
@@ -334,7 +341,13 @@ extension GTMWebViewController {
             self.navbarItemBack = UIBarButtonItem.init(customView: buttonBack)
             // close item
             let title = NSLocalizedString("close", bundle: bundle, comment: "")
-            self.navbarItemClose = UIBarButtonItem.init(title: title, style: .plain, target: self, action: #selector(onNavigationClose))
+            let closeButton = UIButton.init(type: .custom)
+            closeButton.setTitle(title, for: .normal)
+            closeButton.titleLabel?.font = UIFont.systemFont(ofSize: 15)
+            closeButton.setTitleColor(self.navigationController?.navigationBar.tintColor, for: .normal)
+            closeButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: -24, bottom: 0, right: 24)
+            closeButton.addTarget(self, action: #selector(onNavigationClose), for: .touchUpInside)
+            self.navbarItemClose = UIBarButtonItem.init(customView: closeButton)
         } else {
             // back item
             buttonBack.addTarget(self, action: #selector(onToolbarBack), for: .touchUpInside)
@@ -343,7 +356,8 @@ extension GTMWebViewController {
             let iconForward = UIImage.init(named: "forward", in: bundle, compatibleWith: nil)
             let buttonForward = UIButton.init(type: .custom)
             buttonForward.setImage(iconForward, for: .normal)
-            buttonForward.sizeToFit()
+            buttonForward.imageEdgeInsets = UIEdgeInsets(top: 8, left: -8, bottom: 8, right: 24)
+//            buttonForward.sizeToFit()
             buttonForward.addTarget(self, action: #selector(onToolbarForward), for: .touchUpInside)
             self.toolbarItemForward = UIBarButtonItem.init(customView: buttonForward)
             // refresh item
@@ -351,9 +365,23 @@ extension GTMWebViewController {
             // action item
             self.toolbarItemAction = UIBarButtonItem.init(barButtonSystemItem: .action, target: self, action: #selector(onToolbarAction))
         }
+        
+        
+        // done
+        if let navigationC = self.navigationController {
+            if navigationC.isBeingPresented {
+                let doneButtonItem = UIBarButtonItem.init(barButtonSystemItem: .done, target: self, action: #selector(onNavigationDone))
+                doneButtonItem.setTitleTextAttributes([.font: UIFont.systemFont(ofSize: 15)], for: .normal)
+                self.navigationItem.rightBarButtonItem = doneButtonItem
+            }
+        }
     }
     
     // MARK: - Navigation Events
+    
+    @objc func onNavigationDone() {
+        self.dismiss(animated: true, completion: nil)
+    }
     
     @objc func onNavigationBack() {
         if webView!.canGoBack {
@@ -399,27 +427,25 @@ extension GTMWebViewController {
     func updateNavbarButtonItems() {
         self.navigationItem.setLeftBarButtonItems(nil, animated: false)
         if webView!.canGoBack {
-            print("GTMWebKit -----> disable interactivePopGestureRecognizer ")
             self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
             if let navigC = self.navigationController {
-                let space = UIBarButtonItem.init(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
-                space.width = 10
+//                let space = UIBarButtonItem.init(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
+//                space.width = 8
                 if navigC.viewControllers.count > 1 {
                     if self.isShowCloseItem {
-                        self.navigationItem.setLeftBarButtonItems([self.navbarItemBack!, space, self.navbarItemClose!, space], animated: false)
+                        self.navigationItem.setLeftBarButtonItems([self.navbarItemBack!, self.navbarItemClose!], animated: false)
                     } else {
-                        self.navigationItem.setLeftBarButtonItems([self.navbarItemBack!, space], animated: false)
+                        self.navigationItem.setLeftBarButtonItems([self.navbarItemBack!], animated: false)
                     }
                 } else {
                     if self.isShowCloseItem {
-                        self.navigationItem.setLeftBarButtonItems([self.navbarItemBack!, space, self.navbarItemClose!, space], animated: false)
+                        self.navigationItem.setLeftBarButtonItems([self.navbarItemBack!, self.navbarItemClose!], animated: false)
                     } else {
                         self.navigationItem.setLeftBarButtonItems(nil, animated: false)
                     }
                 }
             }
         } else {
-            print("GTMWebKit -----> enable interactivePopGestureRecognizer ")
             self.navigationItem.setLeftBarButtonItems([self.navbarItemBack!], animated: false)
             self.navigationController?.interactivePopGestureRecognizer?.delegate = nil
             self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
@@ -430,7 +456,7 @@ extension GTMWebViewController {
         self.toolbarItemForward?.isEnabled = webView!.canGoForward
         self.toolbarItemAction?.isEnabled = !webView!.isLoading
         
-        let space = UIBarButtonItem.init(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
+        let space = UIBarButtonItem.init(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         let items = [self.toolbarItemBack!, space, self.toolbarItemForward!, space, self.toolbarItemRefresh!, space, self.toolbarItemAction!]
         self.navigationController?.toolbar.barStyle = (self.navigationController?.navigationBar.barStyle)!
         self.navigationController?.toolbar.tintColor = self.navigationController?.navigationBar.tintColor

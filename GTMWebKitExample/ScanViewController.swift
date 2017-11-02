@@ -9,27 +9,22 @@
 import UIKit
 
 class ScanViewController: LBXScanViewController {
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    weak var delegate: ScanViewControllerDelegate?
+    
+    // MARK: - handleCodeResult
+    /**
+     处理扫码结果，如果是继承本控制器的，可以重写该方法,作出相应地处理
+     */
+    open override func handleCodeResult(arrayResult:[LBXScanResult])
+    {
+        let result:LBXScanResult = arrayResult[0]
+        
+        print("swiftScan -> scan success: barcode = \(result.strScanned!)  type = [\(String(describing: result.strBarCodeType))]")
+        self.delegate?.onScanSuccess(barcode: result.strScanned!)
+        
+        //        self.dismiss(animated: true, completion: nil)
+        let _ = self.navigationController?.popViewController(animated: true)
     }
-    */
 
 }

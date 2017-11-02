@@ -1,4 +1,4 @@
-z//
+//
 //  WeakScriptMessageDelegate.swift
 //  GTMWebKit
 //
