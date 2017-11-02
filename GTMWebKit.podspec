@@ -19,6 +19,6 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '8.0'
   s.frameworks = 'UIKit','Foundation','WebKit'
 
-  s.pod_target_xcconfig = { 'SWIFT_VERSION' => '3.0' }
+  s.pod_target_xcconfig = { 'SWIFT_VERSION' => '4.0' }
 
 end

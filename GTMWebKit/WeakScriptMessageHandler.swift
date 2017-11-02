@@ -9,7 +9,7 @@
 import Foundation
 import WebKit
 
-class WeakScriptMessageHandler:NSObject, WKScriptMessageHandler {
+public class WeakScriptMessageHandler:NSObject, WKScriptMessageHandler {
     weak var realHandler: WKScriptMessageHandler?
     
     init(_ realHandler: WKScriptMessageHandler) {
@@ -18,7 +18,7 @@ class WeakScriptMessageHandler:NSObject, WKScriptMessageHandler {
     }
     
     // MARK:- WKScriptMessageHandler
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         self.realHandler?.userContentController(userContentController, didReceive: message)
     }
 }

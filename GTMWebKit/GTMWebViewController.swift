@@ -35,20 +35,20 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
     /// 网页加载进度指示器
     public var progressView: UIProgressView?
     
-    var navigType: GTMWK_NavigationType! // 控制网页导航的方式（导航栏，工具栏）
+    public var navigType: GTMWK_NavigationType! // 控制网页导航的方式（导航栏，工具栏）
     // MARK: Navigation Items
-    var navbarItemBack: UIBarButtonItem?
-    var navbarItemClose: UIBarButtonItem?
+    public var navbarItemBack: UIBarButtonItem?
+    public var navbarItemClose: UIBarButtonItem?
     // MARK: ToolBar Items
-    var toolbarItemBack: UIBarButtonItem?
-    var toolbarItemForward: UIBarButtonItem?
-    var toolbarItemRefresh: UIBarButtonItem?
-    var toolbarItemAction: UIBarButtonItem?
+    public var toolbarItemBack: UIBarButtonItem?
+    public var toolbarItemForward: UIBarButtonItem?
+    public var toolbarItemRefresh: UIBarButtonItem?
+    public var toolbarItemAction: UIBarButtonItem?
     
     /// 弱代理（处理内存泄漏的问题）
-    var weakScriptHandler: WeakScriptMessageHandler!
+    public var weakScriptHandler: WeakScriptMessageHandler!
     /// 提供给JS的API容器
-    var scriptHandlers: [String: (_ body: Any?) -> Void] = [:]
+    public var scriptHandlers: [String: (_ body: Any?) -> Void] = [:]
     
     // MARK: - Life Cycle
     
@@ -66,7 +66,7 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
         super.viewDidLoad()
 
         self.setup()
-        self.load()     // 加载网页
+        self.loadWebPage()     // 加载网页
     }
     
     override open func viewWillAppear(_ animated: Bool) {
@@ -134,7 +134,7 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
     }
     
     // MARK: - Private
-    private func load() {
+    public func loadWebPage() {
         guard let url = self.webUrl else {
             fatalError("GTMWebKit ----->没有为GTMWebViewController提供网页的URL")
         }
@@ -142,7 +142,7 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
         self.loadUrl(url: url)
     }
     
-    private func loadUrl(url: URL) {
+    public func loadUrl(url: URL) {
         webView?.load(URLRequest.init(url: url))
     }
     
@@ -168,13 +168,13 @@ extension GTMWebViewController: WKScriptMessageHandler {
 // MARK: - 加载进度
 extension GTMWebViewController: WKNavigationDelegate {
     
-    private func addObservers() {
+    func addObservers() {
         self.webView?.addObserver(self, forKeyPath: "loading", options: .new, context: nil)
         self.webView?.addObserver(self, forKeyPath: "title", options: .new, context: nil)
         self.webView?.addObserver(self, forKeyPath: "estimatedProgress", options: .new, context: nil)
     }
     
-    private func removeObservers() {
+    func removeObservers() {
         self.webView?.removeObserver(self, forKeyPath: "loading")
         self.webView?.removeObserver(self, forKeyPath: "title")
         self.webView?.removeObserver(self, forKeyPath: "estimatedProgress")
@@ -278,7 +278,7 @@ extension GTMWebViewController: WKNavigationDelegate {
         
         if let url = navigationAction.request.url?.absoluteString {
             if url.hasSuffix(GTMWK_NET_ERROR_RELOAD_URL) || url.hasSuffix(GTMWK_404_NOT_FOUND_RELOAD_URL) {
-                self.load()
+                self.loadWebPage()
                 print("GTMWebKit -----> do reload the web page")
                 decisionHandler(.cancel)
                 return
@@ -370,7 +370,7 @@ extension GTMWebViewController {
         if let navigationC = self.navigationController {
             if navigationC.isBeingPresented {
                 let doneButtonItem = UIBarButtonItem.init(barButtonSystemItem: .done, target: self, action: #selector(onNavigationDone))
-                doneButtonItem.setTitleTextAttributes([NSAttributedStringKey.font: UIFont.systemFont(ofSize: 15)], for: .normal)
+                doneButtonItem.setTitleTextAttributes([.font: UIFont.systemFont(ofSize: 15)], for: .normal)
                 self.navigationItem.rightBarButtonItem = doneButtonItem
             }
         }
