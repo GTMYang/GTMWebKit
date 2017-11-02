@@ -60,7 +60,7 @@ _**Note:** Make sure that all files in `GTMWebKit` included in Compile Sources i
 
 # 版本
 
-## Vesrion 1.0.0
+## Vesrion 0.0.2
 
 This version requires Xcode 8.0 and Swift 3.
 
