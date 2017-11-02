@@ -7,6 +7,7 @@
 */
 "back" = "返回";
 "close" = " 关闭 ";
+"done" = "完成";
 "loading" = "加载中...";
 "load failed" = "加载失败";
 "load failed:" = "网页加载失败：";

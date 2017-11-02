@@ -369,8 +369,14 @@ extension GTMWebViewController {
         // done
         if let navigationC = self.navigationController {
             if navigationC.isBeingPresented {
-                let doneButtonItem = UIBarButtonItem.init(barButtonSystemItem: .done, target: self, action: #selector(onNavigationDone))
-                doneButtonItem.setTitleTextAttributes([.font: UIFont.systemFont(ofSize: 15)], for: .normal)
+                // done item
+                let title = NSLocalizedString("done", bundle: bundle, comment: "")
+                let doneButton = UIButton.init(type: .custom)
+                doneButton.setTitle(title, for: .normal)
+                doneButton.titleLabel?.font = UIFont.systemFont(ofSize: 15)
+                doneButton.setTitleColor(self.navigationController?.navigationBar.tintColor, for: .normal)
+                doneButton.addTarget(self, action: #selector(onNavigationDone), for: .touchUpInside)
+                let doneButtonItem = UIBarButtonItem.init(customView: doneButton)
                 self.navigationItem.rightBarButtonItem = doneButtonItem
             }
         }
