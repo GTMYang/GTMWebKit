@@ -35,7 +35,7 @@
 		26712C7B1FAAE8D600AC3255 /* GTMWebKit.podspec in Resources */ = {isa = PBXBuildFile; fileRef = 26712C781FAAE8D500AC3255 /* GTMWebKit.podspec */; };
 		26712C7C1FAAE8D600AC3255 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 26712C791FAAE8D500AC3255 /* LICENSE */; };
 		26712C7D1FAAE8D600AC3255 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 26712C7A1FAAE8D500AC3255 /* README.md */; };
-		26712C7F1FAAEE2C00AC3255 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 26712C7E1FAAEE2B00AC3255 /* logo.png */; };
+		26712C7F1FAAEE2C00AC3255 /* logo1.png in Resources */ = {isa = PBXBuildFile; fileRef = 26712C7E1FAAEE2B00AC3255 /* logo1.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -95,7 +95,7 @@
 		26712C781FAAE8D500AC3255 /* GTMWebKit.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GTMWebKit.podspec; sourceTree = "<group>"; };
 		26712C791FAAE8D500AC3255 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		26712C7A1FAAE8D500AC3255 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		26712C7E1FAAEE2B00AC3255 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = logo.png; path = GTMWebKitExample/Assets.xcassets/Logo.imageset/logo.png; sourceTree = "<group>"; };
+		26712C7E1FAAEE2B00AC3255 /* logo1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = logo1.png; path = GTMWebKitExample/Assets.xcassets/Logo.imageset/logo1.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,7 +120,7 @@
 		2657A38F1FA9939300A717A3 = {
 			isa = PBXGroup;
 			children = (
-				26712C7E1FAAEE2B00AC3255 /* logo.png */,
+				26712C7E1FAAEE2B00AC3255 /* logo1.png */,
 				26712C781FAAE8D500AC3255 /* GTMWebKit.podspec */,
 				26712C791FAAE8D500AC3255 /* LICENSE */,
 				26712C7A1FAAE8D500AC3255 /* README.md */,
@@ -324,7 +324,7 @@
 				26712C7C1FAAE8D600AC3255 /* LICENSE in Resources */,
 				2657A3C91FA994BE00A717A3 /* test.html in Resources */,
 				26712C7B1FAAE8D600AC3255 /* GTMWebKit.podspec in Resources */,
-				26712C7F1FAAEE2C00AC3255 /* logo.png in Resources */,
+				26712C7F1FAAEE2C00AC3255 /* logo1.png in Resources */,
 				26712C7D1FAAE8D600AC3255 /* README.md in Resources */,
 				2657A3C31FA993EA00A717A3 /* LaunchScreen.storyboard in Resources */,
 				2657A3C01FA993EA00A717A3 /* Assets.xcassets in Resources */,
