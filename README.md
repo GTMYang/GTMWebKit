@@ -14,7 +14,7 @@
 
 GTMWebKit
 ===================
-`GTMWebKit` swift 针对 WKWebKit 的封装
+`GTMWebKit` swift 针对 WKWebView 的封装
 
 # Introduction
 
