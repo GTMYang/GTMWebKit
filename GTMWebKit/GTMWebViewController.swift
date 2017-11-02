@@ -168,13 +168,13 @@ extension GTMWebViewController: WKScriptMessageHandler {
 // MARK: - 加载进度
 extension GTMWebViewController: WKNavigationDelegate {
     
-    func addObservers() {
+    public func addObservers() {
         self.webView?.addObserver(self, forKeyPath: "loading", options: .new, context: nil)
         self.webView?.addObserver(self, forKeyPath: "title", options: .new, context: nil)
         self.webView?.addObserver(self, forKeyPath: "estimatedProgress", options: .new, context: nil)
     }
     
-    func removeObservers() {
+    public func removeObservers() {
         self.webView?.removeObserver(self, forKeyPath: "loading")
         self.webView?.removeObserver(self, forKeyPath: "title")
         self.webView?.removeObserver(self, forKeyPath: "estimatedProgress")
@@ -311,9 +311,9 @@ extension GTMWebViewController: WKNavigationDelegate {
     // MARK: - 错误处理
     private func didFailLoadWithError(error: NSError) {
         if error.code == NSURLErrorCannotFindHost {
-            self.loadUrl(url: URL.init(fileURLWithPath: self.GTMWK_404_NOT_FOUND_HTML_PATH))
+            self.loadWithUrl(url: URL.init(fileURLWithPath: self.GTMWK_404_NOT_FOUND_HTML_PATH))
         } else {
-            self.loadUrl(url: URL.init(fileURLWithPath: self.GTMWK_NET_ERROR_HTML_PATH))
+            self.loadWithUrl(url: URL.init(fileURLWithPath: self.GTMWK_NET_ERROR_HTML_PATH))
         }
     }
 }
