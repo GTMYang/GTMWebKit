@@ -26,29 +26,45 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
         return Bundle.init(for: GTMWebViewController.self).path(forResource: "GTMWebKit.bundle/html.bundle/neterror", ofType: "html")!
     }
     
-    // MARK: - public props
-    public var webView: WKWebView?
+    // MARK: - 通用属性
+    public var webView: GTMWebViewShell?
     public var isShowCloseItem = true   // 是否显示关闭按钮（navigType == .navbar 时使用）
     public var isShowToolbar = true     // 是否显示工具栏（navigType == .toolbar 时使用）
     
-    public var webUrl: URL?
+    // Private props
+    private var webUrl: URL?
     /// 网页加载进度指示器
-    public var progressView: UIProgressView?
+    var progressView: UIProgressView?
     
-    public var navigType: GTMWK_NavigationType! // 控制网页导航的方式（导航栏，工具栏）
+    private var navigType: GTMWK_NavigationType! // 控制网页导航的方式（导航栏，工具栏）
     // MARK: Navigation Items
-    public var navbarItemBack: UIBarButtonItem?
-    public var navbarItemClose: UIBarButtonItem?
+    private var navbarItemBack: UIBarButtonItem?
+    private var navbarItemClose: UIBarButtonItem?
     // MARK: ToolBar Items
-    public var toolbarItemBack: UIBarButtonItem?
-    public var toolbarItemForward: UIBarButtonItem?
-    public var toolbarItemRefresh: UIBarButtonItem?
-    public var toolbarItemAction: UIBarButtonItem?
+    private var toolbarItemBack: UIBarButtonItem?
+    private var toolbarItemForward: UIBarButtonItem?
+    private var toolbarItemRefresh: UIBarButtonItem?
+    private var toolbarItemAction: UIBarButtonItem?
     
+    
+    // MARK: - WKWebView 属性
+    // 是否使用reload的方式处理内存占用过大造成的白屏问题
+    // 当打开的时候如果某个页面出现频繁刷新的情况，建议优化网页
+    public var isTreatMemeryCrushWithReload = false
     /// 弱代理（处理内存泄漏的问题）
     public var weakScriptHandler: WeakScriptMessageHandler!
     /// 提供给JS的API容器
-    public var scriptHandlers: [String: (_ body: Any?) -> Void] = [:]
+    var scriptHandlers: [String: (_ body: Any?) -> Void] = [:]
+    // Cookies处理属性
+    public static let sharedProcessPool = WKProcessPool()
+    
+    
+    // MARK: - UIWebView 属性
+    public var isSwipingBack: Bool = false      // 滑动状态标记
+    public var snapshotVs: [UIView] = []
+    public var currentSnapshotV: UIView?
+    public var previousSnapshotV: UIView?
+    var progresser: GTMWebViewProgress?
     
     // MARK: - Life Cycle
     
@@ -84,42 +100,43 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
     }
     
     private func setup() {
-        // init weakScriptHandler
-        self.weakScriptHandler = WeakScriptMessageHandler(self)
+        // 导航栏不透明
+        self.navigationController?.navigationBar.isTranslucent = false
         
         /// init sub views
+        
         // web view
-        let configuration = WKWebViewConfiguration()    // 配置
-        configuration.preferences.minimumFontSize = 10
-        configuration.preferences.javaScriptEnabled = true
-        configuration.allowsInlineMediaPlayback = true  // 允许视频播放回退
-        configuration.userContentController = WKUserContentController()     // 交互对象
-        configuration.userContentController.add(self.weakScriptHandler, name: "GTMWebKitAPI")
-        self.webView = WKWebView(frame: self.view.bounds, configuration: configuration)     // WKWebView
-        self.webView?.uiDelegate = self
-        self.webView?.navigationDelegate = self
-        self.webView?.allowsBackForwardNavigationGestures = true
-        self.view.addSubview(self.webView!)
+        if #available(iOS 11.0, *) {
+            // iOS 11 以上系统 使用 WKWebView (因为只有iOS11+中WKWebView才能彻底共享Cookies，所以只在这种情况使用WKWebView)
+            // 因为iOS的更新率比较高， 所以很快大多数设备都能用上 WKWebView
+            self.setupWkWebView()
+        } else {
+            // iOS 11 以下的系统还是使用UIWebView (UIWebView不需要做任何处理就能跟原生代码共享Cookies)
+            self.setupUiWebView()
+        }
+        
+        self.addObservers() // KVO
         
         // progress view
         self.progressView = UIProgressView(progressViewStyle: .default)
         self.progressView?.frame = self.view.bounds
-        let top = self.navigationController?.navigationBar.bounds.size.height ?? 0
-        self.progressView?.frame.origin.y = top > 0 ? top + CGFloat(20) : 0
+//        let top = self.navigationController?.navigationBar.bounds.size.height ?? 0
+//        self.progressView?.frame.origin.y = top > 0 ? top + CGFloat(20) : 0
         self.progressView?.trackTintColor = UIColor.white
         self.progressView?.tintColor = UIColor.gray
         self.view.addSubview(self.progressView!)
         
-        // add observers
-        self.addObservers()
-        
         // init button items
         self.initButtonItems()
+        
     }
     
     deinit {
-        print("GTMWebKit -----> GTMWebViewController deinit")
         self.removeObservers()
+        if #available(iOS 11.0, *) { } else {
+            self.progresser = nil
+        }
+        print("GTMWebKit -----> GTMWebViewController deinit")
     }
     
     // MARK: - Public
@@ -129,12 +146,12 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
         self.scriptHandlers[methodName] = handler
     }
     /// 注入JS
-    public func injectUserScript(script: WKUserScript) {
-        self.webView?.configuration.userContentController.addUserScript(script)
-    }
+//    public func injectUserScript(script: WKUserScript) {
+//        self.webView?.configuration.userContentController.addUserScript(script)
+//    }
     
     // MARK: - Private
-    public func loadWebPage() {
+    func loadWebPage() {
         guard let url = self.webUrl else {
             fatalError("GTMWebKit ----->没有为GTMWebViewController提供网页的URL")
         }
@@ -142,180 +159,36 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
         self.loadWithUrl(url: url)
     }
     
-    public func loadWithUrl(url: URL) {
-        webView?.load(URLRequest.init(url: url))
+    func loadWithUrl(url: URL) {
+        webView?.gtm_load(URLRequest.init(url: url))
     }
     
-}
-
-extension GTMWebViewController: WKScriptMessageHandler {
-    
-    public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        if message.name == "GTMWebKitAPI" {
-            if let body = message.body as? Dictionary<String, Any> {
-                let method = body["method"] as! String
-                print("\(body)")
-                print("\(method)")
-                
-                if let handler = self.scriptHandlers[method] {
-                    handler(body["body"])
-                }
-            }
-        }
-    }
-}
-
-// MARK: - 加载进度
-extension GTMWebViewController: WKNavigationDelegate {
-    
-    public func addObservers() {
-        self.webView?.addObserver(self, forKeyPath: "loading", options: .new, context: nil)
-        self.webView?.addObserver(self, forKeyPath: "title", options: .new, context: nil)
-        self.webView?.addObserver(self, forKeyPath: "estimatedProgress", options: .new, context: nil)
-    }
-    
-    public func removeObservers() {
-        self.webView?.removeObserver(self, forKeyPath: "loading")
-        self.webView?.removeObserver(self, forKeyPath: "title")
-        self.webView?.removeObserver(self, forKeyPath: "estimatedProgress")
-    }
-    
-    // MARK: - KVO
-    override open func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if keyPath == "loading" {
-            print("GTMWebKit ----->loading")
-        } else if keyPath == "title" {
-            self.title = self.webView?.title
-            self.updateButtonItems() // 更新导航按钮状态
-        } else if keyPath == "estimatedProgress" {
-            self.progressView?.isHidden = false
-            self.progressView?.setProgress(Float(webView!.estimatedProgress), animated: true)
-        }
-        
-        // 已经完成加载时，我们就可以做我们的事了
-        if !webView!.isLoading {
-            self.progressView?.setProgress(0, animated: false)
-            self.progressView?.isHidden = true
-        }
-    }
-    
-    // MARK: - WKNavigationDelegate
-    public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
-        
-    }
-    // MARK: Initiating the Navigation
-    public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        
-    }
-    // MARK: Responding to Server Actions
-    public func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
-        
-        print(navigation.description)
-    }
-    // Authentication Challenges
-    public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        
-        var disposition: URLSession.AuthChallengeDisposition = URLSession.AuthChallengeDisposition.performDefaultHandling
-        var credential: URLCredential?
-        
-        if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust {
-            disposition = URLSession.AuthChallengeDisposition.useCredential
-            credential = URLCredential(trust: challenge.protectionSpace.serverTrust!)
-        }
-        
-        completionHandler(disposition, credential)
-    }
-    // MARK: Tracking Load Progress
-    public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        
-    }
-    public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
-        
-    }
-    // MARK: Permitting Navigation
-    public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        
-        // Disable all the '_blank' target in page's target
-        if let frame = navigationAction.targetFrame {
-            if frame.isMainFrame {
-                webView.evaluateJavaScript("var a = document.getElementsByTagName('a');for(var i=0;i<a.length;i++){a[i].setAttribute('target','');}", completionHandler: nil)
-            }
-        }
-        
-        let components = URLComponents(string: navigationAction.request.url?.absoluteString ?? "")
-        if let comp = components {
-            // APP下载链接自动跳转AppStore 电话链接自动拨打电话 发邮件链接直接打开邮箱
-            var predicate = NSPredicate(format: "SELF BEGINSWITH[cd] 'https://itunes.apple.com/' OR SELF BEGINSWITH[cd] 'mailto:' OR SELF BEGINSWITH[cd] 'tel:' OR SELF BEGINSWITH[cd] 'telprompt:'")
-            if predicate.evaluate(with: comp.url?.absoluteString) { // AppStore 链接
-                if let url = comp.url {
-                    if UIApplication.shared.canOpenURL(url) {
-                        if #available(iOS 10.0, *) {
-                            UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                        } else {
-                            UIApplication.shared.openURL(url)
-                        }
-                    }
-                }
-                decisionHandler(.cancel)
-                return
-            } else {
-                predicate = NSPredicate(format: "SELF MATCHES[cd] 'https' OR SELF MATCHES[cd] 'http' OR SELF MATCHES[cd] 'file' OR SELF MATCHES[cd] 'about'")
-                if !predicate.evaluate(with: comp.scheme) {
-                    if let url = comp.url {
-                        if UIApplication.shared.canOpenURL(url) {
-                            if #available(iOS 10.0, *) {
-                                UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                            } else {
-                                UIApplication.shared.openURL(url)
-                            }
-                        }
-                    }
-                    decisionHandler(.cancel)
-                    return
-                }
-            }
-        }
-        
-        if let url = navigationAction.request.url?.absoluteString {
-            if url.hasSuffix(GTMWK_NET_ERROR_RELOAD_URL) || url.hasSuffix(GTMWK_404_NOT_FOUND_RELOAD_URL) {
-                self.loadWebPage()
-                print("GTMWebKit -----> do reload the web page")
-                decisionHandler(.cancel)
-                return
-            }
-        }
-        
-//        self.updateButtonItems() // 更新导航按钮状态
-        decisionHandler(.allow)
-    }
-    public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
-        
-        print("GTMWebKit ----->decidePolicyFor navigationResponse")
-        decisionHandler(.allow)
-    }
-    // MARK: Reacting to Errors
-    public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        let nserror = error as NSError
-        if nserror.code == NSURLErrorCancelled {
-            return
-        }
-        self.didFailLoadWithError(error: nserror)
-    }
-    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        let nserror = error as NSError
-        if nserror.code == NSURLErrorCancelled {
-            return
-        }
-        self.didFailLoadWithError(error: nserror)
-    }
     // MARK: - 错误处理
-    private func didFailLoadWithError(error: NSError) {
+    func didFailLoadWithError(error: NSError) {
         if error.code == NSURLErrorCannotFindHost {
             self.loadWithUrl(url: URL.init(fileURLWithPath: self.GTMWK_404_NOT_FOUND_HTML_PATH))
         } else {
             self.loadWithUrl(url: URL.init(fileURLWithPath: self.GTMWK_NET_ERROR_HTML_PATH))
         }
     }
+    
+    // MARK: - KVO
+    func addObservers() {
+        if #available(iOS 11.0, *) {
+            self.wkwebv_addObservers()
+        }
+    }
+    func removeObservers() {
+        if #available(iOS 11.0, *) {
+            self.wkwebv_removeObservers()
+        }
+    }
+    open override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if #available(iOS 11.0, *) {
+            self.wkwebv_observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+        }
+    }
+    
 }
 
 extension GTMWebViewController {
@@ -331,7 +204,12 @@ extension GTMWebViewController {
         }
         let buttonBack = UIButton.init(type: .custom)
         buttonBack.setImage(iconBack, for: .normal)
-        buttonBack.imageEdgeInsets = UIEdgeInsets(top: 8, left: -8, bottom: 8, right: 24)
+        buttonBack.frame = CGRect(x: 0, y: 0, width: 20, height: 44)
+        if #available(iOS 11.0, *) {
+            buttonBack.imageEdgeInsets = UIEdgeInsets(top: 12, left: 4, bottom: 12, right: 4)
+        } else {
+            buttonBack.imageEdgeInsets = UIEdgeInsets(top: 12, left: -8, bottom: 12, right: 8)
+        }
 //        buttonBack.sizeToFit()
         
         if navigType == .navbar {
@@ -344,7 +222,13 @@ extension GTMWebViewController {
             closeButton.setTitle(title, for: .normal)
             closeButton.titleLabel?.font = UIFont.systemFont(ofSize: 15)
             closeButton.setTitleColor(self.navigationController?.navigationBar.tintColor, for: .normal)
-            closeButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: -24, bottom: 0, right: 24)
+            closeButton.frame = CGRect(x: 0, y: 0, width: 40, height: 44)
+            if #available(iOS 11.0, *) {
+                closeButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: -10, bottom: 0, right: 10)
+            } else {
+                closeButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: -5, bottom: 0, right: 5)
+            }
+           
             closeButton.addTarget(self, action: #selector(onNavigationClose), for: .touchUpInside)
             self.navbarItemClose = UIBarButtonItem.init(customView: closeButton)
         } else {
@@ -355,7 +239,12 @@ extension GTMWebViewController {
             let iconForward = UIImage.init(named: "forward", in: bundle, compatibleWith: nil)
             let buttonForward = UIButton.init(type: .custom)
             buttonForward.setImage(iconForward, for: .normal)
-            buttonForward.imageEdgeInsets = UIEdgeInsets(top: 8, left: -8, bottom: 8, right: 24)
+            buttonForward.frame = CGRect(x: 0, y: 0, width: 20, height: 44)
+            if #available(iOS 11.0, *) {
+                buttonForward.imageEdgeInsets = UIEdgeInsets(top: 12, left: 4, bottom: 12, right: 4)
+            } else {
+                buttonForward.imageEdgeInsets = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
+            }
 //            buttonForward.sizeToFit()
             buttonForward.addTarget(self, action: #selector(onToolbarForward), for: .touchUpInside)
             self.toolbarItemForward = UIBarButtonItem.init(customView: buttonForward)
@@ -372,6 +261,7 @@ extension GTMWebViewController {
                 // done item
                 let title = NSLocalizedString("done", bundle: bundle, comment: "")
                 let doneButton = UIButton.init(type: .custom)
+                doneButton.frame = CGRect(x: 0, y: 0, width: 40, height: 44)
                 doneButton.setTitle(title, for: .normal)
                 doneButton.titleLabel?.font = UIFont.systemFont(ofSize: 15)
                 doneButton.setTitleColor(self.navigationController?.navigationBar.tintColor, for: .normal)
@@ -389,8 +279,8 @@ extension GTMWebViewController {
     }
     
     @objc func onNavigationBack() {
-        if webView!.canGoBack {
-            webView?.goBack()
+        if webView!.gtm_canGoBacK {
+            self.onWebpageBack()
         } else {
             self.navigationController?.popViewController(animated: true)
         }
@@ -401,22 +291,34 @@ extension GTMWebViewController {
     
     
     @objc func onToolbarBack() {
-        if webView!.canGoBack {
-            webView?.goBack()
-        }
+        self.onWebpageBack()
     }
     @objc func onToolbarForward() {
-        if webView!.canGoForward {
-            webView?.goForward()
-        }
+        webView?.gtm_goForward()
     }
     @objc func onToolbarRefresh() {
-        webView?.reload()
+        webView?.gtm_reload()
     }
     @objc func onToolbarAction() {
-        if let url = webView?.url {
+        if let url = webView?.gtm_url {
             let activityVC = UIActivityViewController.init(activityItems: [url], applicationActivities: nil)
             self.present(activityVC, animated: true, completion: nil)
+        }
+    }
+    
+    func onWebpageBack() {
+        webView?.gtm_goBack()
+        if #available(iOS 11.0, *) {
+            
+        } else {
+            self.popSnapShotView()
+            
+            let time: TimeInterval = 1.0
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + time) {
+                self.title = self.webView?.web_title
+            }
+            
+            self.updateButtonItems()
         }
     }
     
@@ -431,11 +333,9 @@ extension GTMWebViewController {
     }
     func updateNavbarButtonItems() {
         self.navigationItem.setLeftBarButtonItems(nil, animated: false)
-        if webView!.canGoBack {
+        if webView!.gtm_canGoBacK {
             self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
             if let navigC = self.navigationController {
-//                let space = UIBarButtonItem.init(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
-//                space.width = 8
                 if navigC.viewControllers.count > 1 {
                     if self.isShowCloseItem {
                         self.navigationItem.setLeftBarButtonItems([self.navbarItemBack!, self.navbarItemClose!], animated: false)
@@ -457,9 +357,9 @@ extension GTMWebViewController {
         }
     }
     func updateToolbarButtonItems() {
-        self.toolbarItemBack?.isEnabled = webView!.canGoBack
-        self.toolbarItemForward?.isEnabled = webView!.canGoForward
-        self.toolbarItemAction?.isEnabled = !webView!.isLoading
+        self.toolbarItemBack?.isEnabled = webView!.gtm_canGoBacK
+        self.toolbarItemForward?.isEnabled = webView!.gtm_canGoForward
+        self.toolbarItemAction?.isEnabled = !webView!.gtm_isLoading
         
         let space = UIBarButtonItem.init(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         let items = [self.toolbarItemBack!, space, self.toolbarItemForward!, space, self.toolbarItemRefresh!, space, self.toolbarItemAction!]

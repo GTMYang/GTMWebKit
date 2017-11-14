@@ -8,6 +8,7 @@
 
 import UIKit
 import GTMWebKit
+import WebKit
 
 class CustomWebViewController: GTMWebViewController {
     
@@ -61,7 +62,8 @@ class CustomWebViewController: GTMWebViewController {
     
     // MARK: - Events
     @objc func onCallJsMethod() {
-        self.webView?.evaluateJavaScript("changeColor();", completionHandler: nil)
+        let wkwebV = self.webView as? WKWebView
+        wkwebV?.evaluateJavaScript("changeColor();", completionHandler: nil)
     }
     
     // MARK: - Private

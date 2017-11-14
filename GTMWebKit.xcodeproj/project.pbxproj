@@ -36,6 +36,11 @@
 		26712C7C1FAAE8D600AC3255 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 26712C791FAAE8D500AC3255 /* LICENSE */; };
 		26712C7D1FAAE8D600AC3255 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 26712C7A1FAAE8D500AC3255 /* README.md */; };
 		26712C811FAAF30000AC3255 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 26712C801FAAF30000AC3255 /* logo.png */; };
+		26B891F61FB3E5AF00EC7251 /* GTMWebView+WKWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B891F51FB3E5AF00EC7251 /* GTMWebView+WKWebView.swift */; };
+		26B891F81FB3E5C600EC7251 /* GTMWebView+UIWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B891F71FB3E5C600EC7251 /* GTMWebView+UIWebView.swift */; };
+		26B891FA1FB3E9C900EC7251 /* GTMWebViewShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B891F91FB3E9C900EC7251 /* GTMWebViewShell.swift */; };
+		26D414051FB5438F00D267F1 /* GTMWebView+PanGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26D414041FB5438F00D267F1 /* GTMWebView+PanGesture.swift */; };
+		26D414071FB590E600D267F1 /* GTMWebViewProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26D414061FB590E600D267F1 /* GTMWebViewProgress.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -96,6 +101,11 @@
 		26712C791FAAE8D500AC3255 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		26712C7A1FAAE8D500AC3255 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		26712C801FAAF30000AC3255 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.png; sourceTree = "<group>"; };
+		26B891F51FB3E5AF00EC7251 /* GTMWebView+WKWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GTMWebView+WKWebView.swift"; sourceTree = "<group>"; };
+		26B891F71FB3E5C600EC7251 /* GTMWebView+UIWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GTMWebView+UIWebView.swift"; sourceTree = "<group>"; };
+		26B891F91FB3E9C900EC7251 /* GTMWebViewShell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GTMWebViewShell.swift; sourceTree = "<group>"; };
+		26D414041FB5438F00D267F1 /* GTMWebView+PanGesture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GTMWebView+PanGesture.swift"; sourceTree = "<group>"; };
+		26D414061FB590E600D267F1 /* GTMWebViewProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GTMWebViewProgress.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -143,8 +153,13 @@
 			isa = PBXGroup;
 			children = (
 				2657A3A51FA993C100A717A3 /* GTMAlertable.swift */,
+				26B891F91FB3E9C900EC7251 /* GTMWebViewShell.swift */,
 				2657A3A61FA993C200A717A3 /* GTMWebView+Alert.swift */,
 				2657A3A81FA993C200A717A3 /* GTMWebView+Bundle.swift */,
+				26B891F51FB3E5AF00EC7251 /* GTMWebView+WKWebView.swift */,
+				26B891F71FB3E5C600EC7251 /* GTMWebView+UIWebView.swift */,
+				26D414041FB5438F00D267F1 /* GTMWebView+PanGesture.swift */,
+				26D414061FB590E600D267F1 /* GTMWebViewProgress.swift */,
 				2657A3A71FA993C200A717A3 /* GTMWebViewController.swift */,
 				2657A3A91FA993C200A717A3 /* URLConvertible.swift */,
 				2657A3AA1FA993C200A717A3 /* WeakScriptMessageHandler.swift */,
@@ -339,12 +354,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26B891F81FB3E5C600EC7251 /* GTMWebView+UIWebView.swift in Sources */,
+				26B891F61FB3E5AF00EC7251 /* GTMWebView+WKWebView.swift in Sources */,
+				26D414071FB590E600D267F1 /* GTMWebViewProgress.swift in Sources */,
 				2657A3AF1FA993C200A717A3 /* GTMWebView+Bundle.swift in Sources */,
 				2657A3B11FA993C200A717A3 /* WeakScriptMessageHandler.swift in Sources */,
 				2657A3AC1FA993C200A717A3 /* GTMAlertable.swift in Sources */,
 				2657A3AE1FA993C200A717A3 /* GTMWebViewController.swift in Sources */,
+				26D414051FB5438F00D267F1 /* GTMWebView+PanGesture.swift in Sources */,
 				2657A3AD1FA993C200A717A3 /* GTMWebView+Alert.swift in Sources */,
 				2657A3B01FA993C200A717A3 /* URLConvertible.swift in Sources */,
+				26B891FA1FB3E9C900EC7251 /* GTMWebViewShell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
