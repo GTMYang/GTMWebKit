@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13196" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="oLq-Lz-A4K">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="oLq-Lz-A4K">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13174"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13527"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -176,6 +177,78 @@
                                                 <constraint firstItem="XFF-2r-Gxl" firstAttribute="leading" secondItem="8gC-1W-uEC" secondAttribute="leading" constant="20" id="fLG-nb-yBf"/>
                                                 <constraint firstItem="jIW-Xs-KQD" firstAttribute="leading" secondItem="8gC-1W-uEC" secondAttribute="leading" constant="20" id="j0K-ds-DZQ"/>
                                                 <constraint firstItem="XFF-2r-Gxl" firstAttribute="top" secondItem="8gC-1W-uEC" secondAttribute="top" constant="8" id="poo-FI-VoA"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="60" id="CvT-QH-PZe">
+                                        <rect key="frame" x="0.0" y="240" width="375" height="60"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="CvT-QH-PZe" id="dMV-JC-YeI">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="59.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Cookies -&gt; UIWebView" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Vht-mf-iUc">
+                                                    <rect key="frame" x="20" y="8" width="176" height="21"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="21" id="Pa6-S7-cyi"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Test UIwebView cookies" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zT3-t6-Poa">
+                                                    <rect key="frame" x="20" y="31" width="335" height="21"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="21" id="Nws-Vu-K6o"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                    <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="Vht-mf-iUc" firstAttribute="top" secondItem="dMV-JC-YeI" secondAttribute="top" constant="8" id="0z5-Ba-a5h"/>
+                                                <constraint firstAttribute="bottom" secondItem="zT3-t6-Poa" secondAttribute="bottom" constant="8" id="GMP-1T-KqD"/>
+                                                <constraint firstItem="zT3-t6-Poa" firstAttribute="leading" secondItem="dMV-JC-YeI" secondAttribute="leading" constant="20" id="MJq-Pa-QgJ"/>
+                                                <constraint firstItem="Vht-mf-iUc" firstAttribute="leading" secondItem="dMV-JC-YeI" secondAttribute="leading" constant="20" id="hb9-Oo-tWT"/>
+                                                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Vht-mf-iUc" secondAttribute="trailing" constant="20" symbolic="YES" id="oNc-Nm-aGe"/>
+                                                <constraint firstAttribute="trailing" secondItem="zT3-t6-Poa" secondAttribute="trailing" constant="20" id="prp-wZ-F4k"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="60" id="Y24-wx-Zix">
+                                        <rect key="frame" x="0.0" y="300" width="375" height="60"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Y24-wx-Zix" id="rj8-IQ-p3p">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="59.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Cookies -&gt; WKWebView" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GvY-Pn-kZy">
+                                                    <rect key="frame" x="20" y="8" width="187" height="21"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="21" id="B3b-EY-iK6"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Test WKWebView cookies" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jPV-zT-qSI">
+                                                    <rect key="frame" x="20" y="31" width="335" height="21"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="21" id="Q7V-Pf-7Nh"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                    <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="GvY-Pn-kZy" firstAttribute="leading" secondItem="rj8-IQ-p3p" secondAttribute="leading" constant="20" id="1QC-tr-vG6"/>
+                                                <constraint firstItem="GvY-Pn-kZy" firstAttribute="top" secondItem="rj8-IQ-p3p" secondAttribute="top" constant="8" id="73G-ga-0eH"/>
+                                                <constraint firstAttribute="bottom" secondItem="jPV-zT-qSI" secondAttribute="bottom" constant="8" id="7Va-Gg-Gt0"/>
+                                                <constraint firstItem="jPV-zT-qSI" firstAttribute="leading" secondItem="rj8-IQ-p3p" secondAttribute="leading" constant="20" id="HOn-xY-Jcj"/>
+                                                <constraint firstAttribute="trailing" secondItem="jPV-zT-qSI" secondAttribute="trailing" constant="20" id="Ine-kH-eke"/>
+                                                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="GvY-Pn-kZy" secondAttribute="trailing" constant="20" symbolic="YES" id="KYZ-UD-Mvf"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>

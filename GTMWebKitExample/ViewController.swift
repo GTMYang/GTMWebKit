@@ -46,8 +46,26 @@ class ViewController: UITableViewController {
             let url = Bundle.main.url(forResource: "test", withExtension: "html")
             let webVC = CustomWebViewController.init(with: url!, navigType: .navbar)
             self.navigationController?.pushViewController(webVC, animated: true)
+        } else if indexPath.row == 4 {
+            // UIWebView Cookies
+            let webVC = UIWebViewCookiesVC.init(with: cookieTestUrl, navigType: .navbar)
+            webVC.isShowCloseItem = false
+            webVC.isShowToolbar = false
+            webVC.isForcedUIWebView = true
+            
+            self.navigationController?.pushViewController(webVC, animated: true)
+        } else if indexPath.row == 5 {
+            // WKWebView Cookies
+            let webVC = WKWebViewCookiesVC.init(with: cookieTestUrl, navigType: .navbar)
+            webVC.isShowCloseItem = false
+            webVC.isShowToolbar = false
+            webVC.isNeedShareCookies = true
+            
+            self.navigationController?.pushViewController(webVC, animated: true)
         }
     }
+    
+    var cookieTestUrl = "http://192.168.85.168" //"https://www.baidu.com" //
 
 }
 

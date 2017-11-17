@@ -12,7 +12,7 @@ import WebKit
 // MARK: - WKWebView
 extension GTMWebViewController: WKNavigationDelegate {
     
-    var wkWebView: WKWebView? {
+    public var wkWebView: WKWebView? {
         return self.webView as? WKWebView
     }
     
@@ -96,7 +96,13 @@ extension GTMWebViewController: WKNavigationDelegate {
     }
     // MARK: Tracking Load Progress
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        
+        print("GTMWebKit ----->webView didFinish")
+        // 共享 Cookies
+        if isNeedShareCookies {
+            if #available(iOS 11.0, *) {
+                GTMWebViewCookies.shareWebViewCookies(url: webView.url!)
+            }
+        }
     }
     public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
         // 如果出现频繁刷新的情况，说明页面占用内存确实过大，需要前端作优化处理

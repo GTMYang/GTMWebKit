@@ -35,7 +35,7 @@ class CustomWebViewController: GTMWebViewController {
         self.view.addSubview(self.lblJsMessage)
         // button
         self.btnCallJsMethod = UIButton.init(type: .custom)
-        btnCallJsMethod.frame = CGRect.init(x: 8, y: screenSize.height - 58, width: screenSize.width - 16 , height: 50)
+        btnCallJsMethod.frame = CGRect.init(x: 8, y: screenSize.height - 122, width: screenSize.width - 16 , height: 50)
         btnCallJsMethod.setTitle("Swift 调用 JS 方法改变网页中控件颜色", for: .normal)
         btnCallJsMethod.setTitleColor(.black, for: .normal)
         btnCallJsMethod.backgroundColor = .white

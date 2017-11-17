@@ -30,6 +30,28 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
     public var webView: GTMWebViewShell?
     public var isShowCloseItem = true   // 是否显示关闭按钮（navigType == .navbar 时使用）
     public var isShowToolbar = true     // 是否显示工具栏（navigType == .toolbar 时使用）
+    public var isForcedUIWebView = false    // 强制使用 UIWebView
+    public var isNeedShareCookies = false   // 是否需要共享cookies
+    
+    public var isUseWKWebView: Bool {
+        if isForcedUIWebView {
+            return false
+        } else {
+            if isNeedShareCookies {
+                if #available(iOS 11.0, *) {
+                    return true
+                } else {
+                    return false
+                }
+            } else {
+                if #available(iOS 8.0, *) {
+                    return true
+                } else {
+                    return false
+                }
+            }
+        }
+    }
     
     // Private props
     private var webUrl: URL?
@@ -106,7 +128,7 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
         /// init sub views
         
         // web view
-        if #available(iOS 11.0, *) {
+        if self.isUseWKWebView {
             // iOS 11 以上系统 使用 WKWebView (因为只有iOS11+中WKWebView才能彻底共享Cookies，所以只在这种情况使用WKWebView)
             // 因为iOS的更新率比较高， 所以很快大多数设备都能用上 WKWebView
             self.setupWkWebView()
@@ -129,11 +151,18 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
         // init button items
         self.initButtonItems()
         
+        // 共享 Cookies
+        if isNeedShareCookies {
+            if #available(iOS 11.0, *) {
+                GTMWebViewCookies.shareNativeCookies(url: self.webUrl!)
+            }
+        }
+        
     }
     
     deinit {
         self.removeObservers()
-        if #available(iOS 11.0, *) { } else {
+        if !self.isUseWKWebView {
             self.progresser = nil
         }
         print("GTMWebKit -----> GTMWebViewController deinit")
@@ -174,17 +203,17 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
     
     // MARK: - KVO
     func addObservers() {
-        if #available(iOS 11.0, *) {
+        if self.isUseWKWebView {
             self.wkwebv_addObservers()
         }
     }
     func removeObservers() {
-        if #available(iOS 11.0, *) {
+        if self.isUseWKWebView {
             self.wkwebv_removeObservers()
         }
     }
     open override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if #available(iOS 11.0, *) {
+        if self.isUseWKWebView {
             self.wkwebv_observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
     }
@@ -210,7 +239,6 @@ extension GTMWebViewController {
         } else {
             buttonBack.imageEdgeInsets = UIEdgeInsets(top: 12, left: -8, bottom: 12, right: 8)
         }
-//        buttonBack.sizeToFit()
         
         if navigType == .navbar {
             // back item
@@ -245,7 +273,6 @@ extension GTMWebViewController {
             } else {
                 buttonForward.imageEdgeInsets = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
             }
-//            buttonForward.sizeToFit()
             buttonForward.addTarget(self, action: #selector(onToolbarForward), for: .touchUpInside)
             self.toolbarItemForward = UIBarButtonItem.init(customView: buttonForward)
             // refresh item
@@ -308,9 +335,7 @@ extension GTMWebViewController {
     
     func onWebpageBack() {
         webView?.gtm_goBack()
-        if #available(iOS 11.0, *) {
-            
-        } else {
+        if !self.isUseWKWebView {
             self.popSnapShotView()
             
             let time: TimeInterval = 1.0
