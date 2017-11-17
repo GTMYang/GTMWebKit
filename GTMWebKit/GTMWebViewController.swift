@@ -58,15 +58,15 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
     /// 网页加载进度指示器
     var progressView: UIProgressView?
     
-    private var navigType: GTMWK_NavigationType! // 控制网页导航的方式（导航栏，工具栏）
+     var navigType: GTMWK_NavigationType! // 控制网页导航的方式（导航栏，工具栏）
     // MARK: Navigation Items
-    private var navbarItemBack: UIBarButtonItem?
-    private var navbarItemClose: UIBarButtonItem?
+     var navbarItemBack: UIBarButtonItem?
+     var navbarItemClose: UIBarButtonItem?
     // MARK: ToolBar Items
-    private var toolbarItemBack: UIBarButtonItem?
-    private var toolbarItemForward: UIBarButtonItem?
-    private var toolbarItemRefresh: UIBarButtonItem?
-    private var toolbarItemAction: UIBarButtonItem?
+     var toolbarItemBack: UIBarButtonItem?
+     var toolbarItemForward: UIBarButtonItem?
+     var toolbarItemRefresh: UIBarButtonItem?
+     var toolbarItemAction: UIBarButtonItem?
     
     
     // MARK: - WKWebView 属性
