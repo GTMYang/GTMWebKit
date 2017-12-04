@@ -180,42 +180,6 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
-                                    <tableViewCell hidden="YES" clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="0.0" id="PUN-qr-OEr">
-                                        <rect key="frame" x="0.0" y="240" width="375" height="0.0"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="PUN-qr-OEr" id="caY-mh-rRL">
-                                            <rect key="frame" x="0.0" y="-0.5" width="375" height="0.5"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="UIWebView Native &lt;-&gt; JS" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Svy-hb-h5u">
-                                                    <rect key="frame" x="20" y="8" width="198" height="21"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="21" id="zJ4-In-WJb"/>
-                                                    </constraints>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <nil key="textColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Native code communication JS" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Kff-wf-fUa">
-                                                    <rect key="frame" x="20" y="-28.5" width="335" height="21"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="21" id="App-so-xPK"/>
-                                                    </constraints>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                                    <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Svy-hb-h5u" secondAttribute="trailing" constant="20" symbolic="YES" id="7gI-sk-vcf"/>
-                                                <constraint firstAttribute="trailing" secondItem="Kff-wf-fUa" secondAttribute="trailing" constant="20" id="KPS-MB-uGI"/>
-                                                <constraint firstAttribute="bottom" secondItem="Kff-wf-fUa" secondAttribute="bottom" constant="8" id="OQy-Ec-bGM"/>
-                                                <constraint firstItem="Kff-wf-fUa" firstAttribute="leading" secondItem="caY-mh-rRL" secondAttribute="leading" constant="20" id="SAT-zA-gfS"/>
-                                                <constraint firstItem="Svy-hb-h5u" firstAttribute="leading" secondItem="caY-mh-rRL" secondAttribute="leading" constant="20" id="bSN-7Y-c0g"/>
-                                                <constraint firstItem="Svy-hb-h5u" firstAttribute="top" secondItem="caY-mh-rRL" secondAttribute="top" constant="8" id="dsf-tH-k2j"/>
-                                            </constraints>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="60" id="CvT-QH-PZe">
                                         <rect key="frame" x="0.0" y="240" width="375" height="60"/>
                                         <autoresizingMask key="autoresizingMask"/>
