@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import JavaScriptCore
 
 // MARK: - UIWebView
 extension GTMWebViewController: UIWebViewDelegate {
@@ -96,6 +97,8 @@ extension GTMWebViewController: UIWebViewDelegate {
     public func webViewDidFinishLoad(_ webView: UIWebView) {
         // items update
         self.updateButtonItems()
+        // api regist
+        self.doApiRegist()
     }
     
     public func webView(_ webView: UIWebView, didFailLoadWithError error: Error) {
@@ -111,11 +114,26 @@ extension GTMWebViewController: UIWebViewDelegate {
     func uiwebv_onWebpageBack() {
         self.popSnapShotView()
         
-        let time: TimeInterval = 1.0
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + time) {
-            self.title = self.webView?.web_title
+        if isUseWebTitle {
+            let time: TimeInterval = 1.0
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + time) {
+                self.title = self.webView?.web_title
+            }
         }
+        
         self.updateButtonItems()
+    }
+    
+    func doApiRegist() {
+        if let context = uiWebView?.value(forKey: "documentView.webView.mainFrame.javaScriptContext") as? JSContext {
+//            for (key, val) in self.scriptHandlers {
+//                context.setValue(val, forKey: key)
+//            }
+            // js 异常处理
+            context.exceptionHandler = { (context, exceptionValue) in
+                self.alert(String(describing: exceptionValue))
+            }
+        }
     }
     
 }
@@ -129,7 +147,9 @@ extension GTMWebViewController: WebProgressRenderDelegate {
         }
         if progress == 1 {
             print("GTMWebKit ---- > progress == 1")
-            self.title = self.webView?.web_title
+            if isUseWebTitle {
+                self.title = self.webView?.web_title
+            }
         }
     }
 }

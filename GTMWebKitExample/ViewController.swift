@@ -41,20 +41,25 @@ class ViewController: UITableViewController {
             
             self.navigationController?.pushViewController(webVC, animated: true)
         } else if indexPath.row == 3 {
-            // Native <-> JS
-            
+            // WKWebView Native <-> JS
             let url = Bundle.main.url(forResource: "test", withExtension: "html")
             let webVC = CustomWebViewController.init(with: url!, navigType: .navbar)
             self.navigationController?.pushViewController(webVC, animated: true)
-        } else if indexPath.row == 4 {
+        }  else if indexPath.row == 4 {
+            // UIWebView Native <-> JS
+            let url = Bundle.main.url(forResource: "test", withExtension: "html")
+            let webVC = CustomWebViewController.init(with: url!, navigType: .navbar)
+            webVC.isForceUIWebView = true
+            self.navigationController?.pushViewController(webVC, animated: true)
+        } else if indexPath.row == 5 {
             // UIWebView Cookies
             let webVC = UIWebViewCookiesVC.init(with: cookieTestUrl, navigType: .navbar)
             webVC.isShowCloseItem = false
             webVC.isShowToolbar = false
-            webVC.isForcedUIWebView = true
+            webVC.isForceUIWebView = true
             
             self.navigationController?.pushViewController(webVC, animated: true)
-        } else if indexPath.row == 5 {
+        } else if indexPath.row == 6 {
             // WKWebView Cookies
             let webVC = WKWebViewCookiesVC.init(with: cookieTestUrl, navigType: .navbar)
             webVC.isShowCloseItem = false

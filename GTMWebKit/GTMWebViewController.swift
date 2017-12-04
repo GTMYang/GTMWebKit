@@ -30,11 +30,12 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
     public var webView: GTMWebViewShell?
     public var isShowCloseItem = true   // 是否显示关闭按钮（navigType == .navbar 时使用）
     public var isShowToolbar = true     // 是否显示工具栏（navigType == .toolbar 时使用）
-    public var isForcedUIWebView = false    // 强制使用 UIWebView
+    public var isForceUIWebView = false    // 强制使用 UIWebView
     public var isNeedShareCookies = false   // 是否需要共享cookies
+    public var isUseWebTitle = true        // 是否使用网页的title
     
     public var isUseWKWebView: Bool {
-        if isForcedUIWebView {
+        if isForceUIWebView {
             return false
         } else {
             if isNeedShareCookies {
@@ -338,9 +339,11 @@ extension GTMWebViewController {
         if !self.isUseWKWebView {
             self.popSnapShotView()
             
-            let time: TimeInterval = 1.0
-            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + time) {
-                self.title = self.webView?.web_title
+            if isUseWebTitle {
+                let time: TimeInterval = 1.0
+                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + time) {
+                    self.title = self.webView?.web_title
+                }
             }
             
             self.updateButtonItems()
@@ -369,14 +372,14 @@ extension GTMWebViewController {
                     }
                 } else {
                     if self.isShowCloseItem {
-                        self.navigationItem.setLeftBarButtonItems([self.navbarItemBack!, self.navbarItemClose!], animated: false)
+                        self.navigationItem.setLeftBarButtonItems([self.navbarItemClose!], animated: false)
                     } else {
                         self.navigationItem.setLeftBarButtonItems(nil, animated: false)
                     }
                 }
             }
         } else {
-            self.navigationItem.setLeftBarButtonItems([self.navbarItemBack!], animated: false)
+            self.navigationItem.setLeftBarButtonItems(nil, animated: false)
             self.navigationController?.interactivePopGestureRecognizer?.delegate = nil
             self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
         }

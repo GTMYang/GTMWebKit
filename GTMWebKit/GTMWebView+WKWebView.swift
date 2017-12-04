@@ -54,7 +54,9 @@ extension GTMWebViewController: WKNavigationDelegate {
         if keyPath == "loading" {
             print("GTMWebKit ----->loading")
         } else if keyPath == "title" {
-            self.title = self.webView?.web_title
+            if isUseWebTitle {
+                self.title = self.webView?.web_title
+            }
             self.updateButtonItems() // 更新导航按钮状态
         } else if keyPath == "estimatedProgress" {
             self.progressView?.isHidden = false
