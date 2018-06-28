@@ -33,6 +33,7 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
     public var isForceUIWebView = false    // 强制使用 UIWebView
     public var isNeedShareCookies = false   // 是否需要共享cookies
     public var isUseWebTitle = true        // 是否使用网页的title
+    public var isNeverSetNavbarItems = false  // 是否设置BarButtonItems
     
     public var isUseWKWebView: Bool {
         if isForceUIWebView {
@@ -225,6 +226,9 @@ extension GTMWebViewController {
     // MARK: - Web Navigation Items
     
     fileprivate func initButtonItems() {
+        guard isNeverSetNavbarItems == false else {
+            return
+        }
         let bundle = self.sourceBundle
         
         // back button
@@ -353,6 +357,10 @@ extension GTMWebViewController {
     // MARK: Update Items
     
     func updateButtonItems() {
+        guard isNeverSetNavbarItems == false else {
+            return
+        }
+        
         if navigType == .navbar {
             self.updateNavbarButtonItems()
         } else {

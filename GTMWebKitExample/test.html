@@ -73,6 +73,8 @@
         // 调用扫描API
         function callBarcodeScan() {
             window.webkit.messageHandlers.GTMWebKitAPI.postMessage({method:'scanBarcode', body: ''});
+            
+            
         }
         
         // 注意哦，如果JS写错，可能在OC调用JS方法时，都会出错哦。
