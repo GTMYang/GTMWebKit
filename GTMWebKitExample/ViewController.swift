@@ -67,6 +67,15 @@ class ViewController: UITableViewController {
             webVC.isNeedShareCookies = true
             
             self.navigationController?.pushViewController(webVC, animated: true)
+        } else if indexPath.row == 6 {
+            // Push
+            let webVC = GTMWebViewController.init(with: "https://www.baidu1.com", navigType: .navbar)
+            self.navigationController?.pushViewController(webVC, animated: true)
+        } else if indexPath.row == 7 {
+            // Push
+            let webVC = GTMWebViewController.init(with: "https://www.baidu.com", navigType: .navbar)
+            webVC.backIconName = "cus_back"
+            self.navigationController?.pushViewController(webVC, animated: true)
         }
     }
     

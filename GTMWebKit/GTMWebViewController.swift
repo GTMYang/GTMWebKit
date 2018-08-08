@@ -34,6 +34,7 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
     public var isNeedShareCookies = false   // 是否需要共享cookies
     public var isUseWebTitle = true        // 是否使用网页的title
     public var isNeverSetNavbarItems = false  // 是否设置BarButtonItems
+    public var backIconName: String?      // 返回按钮图标
     
     public var isUseWKWebView: Bool {
         if isForceUIWebView {
@@ -246,6 +247,10 @@ extension GTMWebViewController {
         }
         
         if navigType == .navbar {
+            if let backIcon = backIconName {
+                iconBack = UIImage(named: backIcon)
+                buttonBack.setImage(iconBack, for: .normal)
+            }
             // back item
             buttonBack.addTarget(self, action: #selector(onNavigationBack), for: .touchUpInside)
             self.navbarItemBack = UIBarButtonItem.init(customView: buttonBack)

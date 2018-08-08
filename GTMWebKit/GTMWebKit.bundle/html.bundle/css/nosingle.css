@@ -1,4 +1,23 @@
 @charset "utf-8";
+html {font-size: 625%; /*100 ÷ 16 × 100% = 625%*/}
+@media screen and (min-width:360px) and (max-width:374px) and (orientation:portrait) {
+    html { font-size: 703%; }
+}
+@media screen and (min-width:375px) and (max-width:383px) and (orientation:portrait) {
+    html { font-size: 732.4%; }
+}
+@media screen and (min-width:384px) and (max-width:399px) and (orientation:portrait) {
+    html { font-size: 750%; }
+}
+@media screen and (min-width:400px) and (max-width:413px) and (orientation:portrait) {
+    html { font-size: 781.25%; }
+}
+@media screen and (min-width:414px) and (max-width:431px) and (orientation:portrait){
+    html { font-size: 808.6%; }
+}
+@media screen and (min-width:432px) and (max-width:479px) and (orientation:portrait){
+    html { font-size: 843.75%; }
+}
 /* CSS Document */
 *{
 	margin:0px; 
@@ -39,7 +58,7 @@ a{
 	color:#646464;
 	font-size:12px;
 	border:1px solid #cecece;
-	width:8rem;
+	width:60%;
 	margin:0.6rem auto;
 	padding:0.3rem 0 0.3rem;
 	border-radius:3px;
@@ -49,11 +68,18 @@ a{
 .neterror{
 	width:4rem;
 	overflow:hidden;
-	margin:6rem auto 1rem;
+	margin:auto;
 	}	
 .neterror img{
-	width:100%;
-	}	
+    width:100%;
+}
+.container {
+    margin: auto;
+    margin-top: 35%;
+    width: 80%;
+    max-width: 400px;
+    min-height:400px;
+}
 	
 	
 	
