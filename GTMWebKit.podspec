@@ -3,7 +3,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "GTMWebKit"
-  s.version      = "0.0.9"
+  s.version      = "0.1.0"
   s.summary      = "swift 针对 WKWebKit 的封装"
   s.swift_version= "4.1.2"
 

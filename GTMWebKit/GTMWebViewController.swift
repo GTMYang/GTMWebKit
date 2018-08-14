@@ -93,10 +93,21 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
     
     // MARK: - Life Cycle
     
+    var urlCovertible: URLConvertible?
     public init(with url: URLConvertible, navigType type: GTMWK_NavigationType) {
         super.init(nibName: nil, bundle: nil)
         self.webUrl = url.url()
         self.navigType = type
+    }
+    
+    public func reload() {
+        guard let url = self.urlCovertible?.url() else {
+            return
+        }
+        if self.webView?.gtm_url?.absoluteString == url.absoluteString {
+            return
+        }
+        self.loadWithUrl(url: url)
     }
     
     public required init?(coder aDecoder: NSCoder) {
