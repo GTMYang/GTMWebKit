@@ -11,16 +11,16 @@ import WebKit
 
 extension GTMWebViewController: WKUIDelegate {
     
-    public func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
+    open func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
         let alert = UIAlertController(title: "", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: { (_) in
             completionHandler()
         }))
         
-        self.present(alert, animated: true, completion: nil)
+        self.present(alert, animated: false, completion: nil)
     }
     
-    public func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (Bool) -> Void) {
+    open func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (Bool) -> Void) {
         let alert = UIAlertController(title: "", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: { (_) in
             completionHandler(true)
@@ -28,10 +28,10 @@ extension GTMWebViewController: WKUIDelegate {
         alert.addAction(UIAlertAction(title: "Cancle", style: .cancel, handler: { (_) in
             completionHandler(false)
         }))
-        self.present(alert, animated: true, completion: nil)
+        self.present(alert, animated: false, completion: nil)
     }
     
-    public func webView(_ webView: WKWebView, runJavaScriptTextInputPanelWithPrompt prompt: String, defaultText: String?, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (String?) -> Void) {
+    open func webView(_ webView: WKWebView, runJavaScriptTextInputPanelWithPrompt prompt: String, defaultText: String?, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (String?) -> Void) {
         
         let alert = UIAlertController(title: prompt, message: defaultText, preferredStyle: .alert)
         alert.addTextField { (textFiled) in
@@ -40,7 +40,7 @@ extension GTMWebViewController: WKUIDelegate {
         alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: { (_) in
             completionHandler(alert.textFields![0].text!)
         }))
-        self.present(alert, animated: true, completion: nil)
+        self.present(alert, animated: false, completion: nil)
     }
     
 }
