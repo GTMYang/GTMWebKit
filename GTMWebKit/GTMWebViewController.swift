@@ -96,6 +96,7 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
     var urlCovertible: URLConvertible?
     public init(with url: URLConvertible, navigType type: GTMWK_NavigationType) {
         super.init(nibName: nil, bundle: nil)
+        self.urlCovertible = url
         self.webUrl = url.url()
         self.navigType = type
     }
