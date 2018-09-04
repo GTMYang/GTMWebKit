@@ -101,14 +101,20 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
         self.navigType = type
     }
     
-    public func reload() {
+    /// 如果当前不在根页面，回到并重新加载根页面。否则什么都不做
+    public func reloadToRootPage() -> Bool {
         guard let url = self.urlCovertible?.url() else {
-            return
+            return false
         }
         if self.webView?.gtm_url?.absoluteString == url.absoluteString {
-            return
+            return false
         }
         self.loadWithUrl(url: url)
+        return true
+    }
+    /// reload当前页面
+    public func reload() {
+        self.webView?.gtm_reload()
     }
     
     public required init?(coder aDecoder: NSCoder) {
