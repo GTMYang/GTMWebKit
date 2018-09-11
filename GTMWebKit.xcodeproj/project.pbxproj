@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2619000321477FFC00B2C31C /* GTMWebKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2619000221477FFC00B2C31C /* GTMWebKit.swift */; };
 		2657A3AB1FA993C200A717A3 /* GTMWebKit.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 2657A3A41FA993C100A717A3 /* GTMWebKit.bundle */; };
 		2657A3AC1FA993C200A717A3 /* GTMAlertable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2657A3A51FA993C100A717A3 /* GTMAlertable.swift */; };
 		2657A3AD1FA993C200A717A3 /* GTMWebView+Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2657A3A61FA993C200A717A3 /* GTMWebView+Alert.swift */; };
@@ -71,6 +72,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2619000221477FFC00B2C31C /* GTMWebKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GTMWebKit.swift; sourceTree = "<group>"; };
 		2657A3991FA9939300A717A3 /* GTMWebKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = GTMWebKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2657A39D1FA9939300A717A3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2657A3A41FA993C100A717A3 /* GTMWebKit.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = GTMWebKit.bundle; sourceTree = "<group>"; };
@@ -167,6 +169,7 @@
 		2657A39B1FA9939300A717A3 /* GTMWebKit */ = {
 			isa = PBXGroup;
 			children = (
+				2619000221477FFC00B2C31C /* GTMWebKit.swift */,
 				2657A3A51FA993C100A717A3 /* GTMAlertable.swift */,
 				26B891F91FB3E9C900EC7251 /* GTMWebViewShell.swift */,
 				2657A3A61FA993C200A717A3 /* GTMWebView+Alert.swift */,
@@ -378,6 +381,7 @@
 				2657A3B11FA993C200A717A3 /* WeakScriptMessageHandler.swift in Sources */,
 				2657A3AC1FA993C200A717A3 /* GTMAlertable.swift in Sources */,
 				2657A3AE1FA993C200A717A3 /* GTMWebViewController.swift in Sources */,
+				2619000321477FFC00B2C31C /* GTMWebKit.swift in Sources */,
 				26D414051FB5438F00D267F1 /* GTMWebView+PanGesture.swift in Sources */,
 				26DDD6EB1FBD8CE50029EA3F /* GTMWebViewCookies.swift in Sources */,
 				2657A3AD1FA993C200A717A3 /* GTMWebView+Alert.swift in Sources */,

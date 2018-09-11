@@ -186,7 +186,7 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
         if !self.isUseWKWebView {
             self.progresser = nil
         }
-        print("GTMWebKit -----> GTMWebViewController deinit")
+        println("GTMWebViewController deinit")
     }
     
     // MARK: - Public
@@ -203,7 +203,8 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
     // MARK: - Private
     func loadWebPage() {
         guard let url = self.webUrl else {
-            fatalError("GTMWebKit ----->没有为GTMWebViewController提供网页的URL")
+            println("没有为GTMWebViewController提供有效的网页URL")
+            return
         }
         
         self.loadWithUrl(url: url)
@@ -213,8 +214,12 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
         webView?.gtm_load(URLRequest.init(url: url))
     }
     
-    // MARK: - 错误处理
-    func didFailLoadWithError(error: NSError) {
+    // MARK: - 钩子函数
+    // web加载完成(相当于抽象函数)
+    open func webWillLoad() { }
+    open func webDidLoad() { }
+    // 错误处理
+    open func webDidLoadFail(error: NSError) {
         if error.code == NSURLErrorCannotFindHost {
             self.loadWithUrl(url: URL.init(fileURLWithPath: self.GTMWK_404_NOT_FOUND_HTML_PATH))
         } else {

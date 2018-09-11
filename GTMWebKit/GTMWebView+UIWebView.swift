@@ -69,7 +69,7 @@ extension GTMWebViewController: UIWebViewDelegate {
         if let url = request.url?.absoluteString {
             if url.hasSuffix(GTMWK_NET_ERROR_RELOAD_URL) || url.hasSuffix(GTMWK_404_NOT_FOUND_RELOAD_URL) {
                 self.loadWebPage()
-                print("GTMWebKit -----> do reload the web page")
+                println("do reload the web page")
                 return false
             }
         }
@@ -92,6 +92,8 @@ extension GTMWebViewController: UIWebViewDelegate {
     }
     
     public func webViewDidStartLoad(_ webView: UIWebView) {
+        // 执行生命周期函数
+        self.webWillLoad()
     }
     
     public func webViewDidFinishLoad(_ webView: UIWebView) {
@@ -99,6 +101,8 @@ extension GTMWebViewController: UIWebViewDelegate {
         self.updateButtonItems()
         // api regist
         self.doApiRegist()
+        // 执行生命周期函数
+        self.webDidLoad()
     }
     
     public func webView(_ webView: UIWebView, didFailLoadWithError error: Error) {
@@ -107,7 +111,7 @@ extension GTMWebViewController: UIWebViewDelegate {
             return
         }
 
-        self.didFailLoadWithError(error: nserror)
+        self.webDidLoadFail(error: nserror)
     }
     
     // MARK: - Private

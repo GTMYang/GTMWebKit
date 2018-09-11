@@ -44,6 +44,15 @@ class CustomWebViewController: GTMWebViewController {
         btnCallJsMethod.addTarget(self, action: #selector(onCallJsMethod), for: .touchUpInside)
         self.view.addSubview(self.btnCallJsMethod)
     }
+    
+    override func webDidLoad() {
+        super.webDidLoad()
+        self.wkWebView?.evaluateJavaScript("jsinit();", completionHandler: { (data, error) in
+            if let _ = error {
+                print("error: javascript 'jsinit()' method is undifind!")
+            }
+        })
+    }
 
     func registApiForJs() {
         

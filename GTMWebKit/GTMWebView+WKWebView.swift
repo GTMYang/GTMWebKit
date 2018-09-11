@@ -52,7 +52,7 @@ extension GTMWebViewController: WKNavigationDelegate {
     
     public func wkwebv_observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == "loading" {
-            print("GTMWebKit ----->loading")
+            println("loading")
         } else if keyPath == "title" {
             if isUseWebTitle {
                 self.title = self.webView?.web_title
@@ -72,7 +72,7 @@ extension GTMWebViewController: WKNavigationDelegate {
     
     // MARK: - WKNavigationDelegate
     public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
-        
+        self.webWillLoad()
     }
     // MARK: Initiating the Navigation
     public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
@@ -98,13 +98,14 @@ extension GTMWebViewController: WKNavigationDelegate {
     }
     // MARK: Tracking Load Progress
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        print("GTMWebKit ----->webView didFinish")
+        println("webView didFinish")
         // 共享 Cookies
         if isNeedShareCookies {
             if #available(iOS 11.0, *) {
                 GTMWebViewCookies.shareWebViewCookies(url: webView.url!)
             }
         }
+        self.webDidLoad()
     }
     public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
         // 如果出现频繁刷新的情况，说明页面占用内存确实过大，需要前端作优化处理
@@ -159,7 +160,7 @@ extension GTMWebViewController: WKNavigationDelegate {
         if let url = navigationAction.request.url?.absoluteString {
             if url.hasSuffix(GTMWK_NET_ERROR_RELOAD_URL) || url.hasSuffix(GTMWK_404_NOT_FOUND_RELOAD_URL) {
                 self.loadWebPage()
-                print("GTMWebKit -----> do reload the web page")
+                println("do reload the web page")
                 decisionHandler(.cancel)
                 return
             }
@@ -170,7 +171,7 @@ extension GTMWebViewController: WKNavigationDelegate {
     }
     public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
         
-        print("GTMWebKit ----->decidePolicyFor navigationResponse")
+        println("decidePolicyFor navigationResponse")
         decisionHandler(.allow)
     }
     // MARK: Reacting to Errors
@@ -179,14 +180,14 @@ extension GTMWebViewController: WKNavigationDelegate {
         if nserror.code == NSURLErrorCancelled {
             return
         }
-        self.didFailLoadWithError(error: nserror)
+        self.webDidLoadFail(error: nserror)
     }
     public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         let nserror = error as NSError
         if nserror.code == NSURLErrorCancelled {
             return
         }
-        self.didFailLoadWithError(error: nserror)
+        self.webDidLoadFail(error: nserror)
     }
 }
 
