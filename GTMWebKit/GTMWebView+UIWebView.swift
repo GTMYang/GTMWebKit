@@ -33,7 +33,7 @@ extension GTMWebViewController: UIWebViewDelegate {
     
     // MARK: - UIWebViewDelegate
     
-    public func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest, navigationType: UIWebViewNavigationType) -> Bool {
+    public func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest, navigationType: UIWebView.NavigationType) -> Bool {
         let components = URLComponents(string: request.url?.absoluteString ?? "")
         if let comp = components {
             // APP下载链接自动跳转AppStore 电话链接自动拨打电话 发邮件链接直接打开邮箱
