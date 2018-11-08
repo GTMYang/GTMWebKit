@@ -24,13 +24,6 @@ GTMWebKit
 - 支持Swift4
 - 支持与原生代码共享Cookies
 
-# 关于Cookies共享
-## 方法1: 将 isNeedShareCookies 属性至为true
-    此种方式在iOS 11.0以后的系统中使用WKWebView，在iOS 11.0之前的系统中使用UIWebView。
-    在使用WKWebView会自动同步WKWebsiteDataStore和HTTPCookieStorage中的Cookies。
-    PS：此种方式我目前没经过详细测试，如果你们发现此种方式有问题，请Issues告诉我，暂时先切到方法2
-  ## 方法2: 将isForcedUIWebView 属性至为true
-    此种方式强制使用UIWebView，Cookies共享没问题
 
 
 # Demo
