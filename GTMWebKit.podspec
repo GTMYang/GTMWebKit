@@ -3,7 +3,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "GTMWebKit"
-  s.version      = "0.5"
+  s.version      = "1.0"
   s.summary      = "swift 针对 WKWebKit 的封装"
   s.swift_version= "4.2"
 
@@ -20,6 +20,5 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '8.0'
   s.frameworks = 'UIKit','Foundation','WebKit'
 
-# s.pod_target_xcconfig = { 'SWIFT_VERSION' => '4.0' }
 
 end

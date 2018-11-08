@@ -71,7 +71,7 @@ class CustomWebViewController: GTMWebViewController {
     
     // MARK: - Events
     @objc func onCallJsMethod() {
-        let wkwebV = self.webView as? WKWebView
+        let wkwebV = self.webView
         wkwebV?.evaluateJavaScript("changeColor();", completionHandler: nil)
     }
     

@@ -17,3 +17,17 @@ func println(_ msg: String) {
         print("GTMWebKit -----> \(msg)")
     }
 }
+
+func GTM_bundle() -> Bundle {
+    let bundle = Bundle.init(for: GTMWebViewController.self)
+    
+    let resourcePath = bundle.path(forResource: "GTMWebKit", ofType: "bundle")
+    if let path = resourcePath {
+        let bundle2 = Bundle.init(path: path)
+        if let bundle = bundle2 {
+            return bundle
+        }
+    }
+    
+    return bundle
+}

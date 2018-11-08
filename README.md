@@ -69,7 +69,7 @@ _**Note:** Make sure that all files in `GTMWebKit` included in Compile Sources i
 
 # 版本
 
-## Vesrion 0.5
+## Vesrion 1.0
 
 This version requires Xcode 9.0 and Swift 4.2.
 
@@ -96,40 +96,24 @@ navigationC.navigationBar.tintColor = UIColor.gray
 self.present(navigationC, animated: true, completion: nil)
 ```
 
-## 注册JS使用的API
-
-```swift
-// 详细代码见Demo中CustomWebViewController.swift
-
-func registApiForJs() {
-
-    // 简单测试方法
-    self.registApi(method: "test") { [weak self] (body) in
-        print("\nCustomWebViewController -----> recived js message: \(body ?? "")\n\n")
-        let message = "\(body ?? "")"
-        self?.showMessage(message: message)
-    }
-    // 扫描功能API
-    self.registApi(method: "scanBarcode") { [weak self] (body) in
-        self?.startScanBarcode(viewTitle: "条码扫描")
-    }
-
-}
-```
-
 ## 配置项
 
 ```swift
 public enum GTMWK_NavigationType {
     case navbar     // web导航控制按钮放在导航栏
     case toolbar    // web导航控制按钮放在底部工具栏
+    case both       // 同时使用两种导航按钮
+    case none       // 不使用web导航按钮
 }
 
- var navigType: GTMWK_NavigationType!   // 控制网页导航的方式（导航栏，工具栏）
- var isShowCloseItem = true             // 是否显示关闭按钮（navigType == .navbar 时使用）
- var isShowToolbar = true               // 是否显示工具栏（navigType == .toolbar 时使用）
- var isForcedUIWebView = false      // 强制使用 UIWebView
- var isNeedShareCookies = false     // 是否需要共享cookies
+ public var navigType: GTMWK_NavigationType!   // 控制网页导航的方式（导航栏，工具栏）
+ public var isShowCloseItem = true             // 是否显示关闭按钮（navigType == .navbar 时使用）
+ public var isShowToolbar = true               // 是否显示工具栏（navigType == .toolbar 时使用）
+ public var isForcedUIWebView = false      // 强制使用 UIWebView
+ public var isNeedShareCookies = false     // 是否需要共享cookies
+ public var backIconName: String?            // 返回按钮图标，可自行设置
+ public var view404: GTMWebErrorView!            // 资源不存在的时候展示的UI，可自定义
+ public var netErrorView: GTMWebErrorView!   // 网络错误的时候展示的UI，可自定义
 
 ```
 

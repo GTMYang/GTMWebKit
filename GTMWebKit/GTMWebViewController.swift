@@ -12,64 +12,37 @@ import WebKit
 public enum GTMWK_NavigationType {
     case navbar     // web导航控制按钮放在导航栏
     case toolbar    // web导航控制按钮放在底部工具栏
+    case both       // 同时使用两种导航按钮
+    case none       // 不使用web导航按钮
 }
 
 open class GTMWebViewController: UIViewController, GTMAlertable {
     
-    let GTMWK_404_NOT_FOUND_RELOAD_URL = "gtmwk_404_not_found"
-    let GTMWK_NET_ERROR_RELOAD_URL = "gtmwk_network_error"
-    
-    var GTMWK_404_NOT_FOUND_HTML_PATH: String {
-        return Bundle.init(for: GTMWebViewController.self).path(forResource: "GTMWebKit.bundle/html.bundle/404", ofType: "html")!
-    }
-    var GTMWK_NET_ERROR_HTML_PATH: String {
-        return Bundle.init(for: GTMWebViewController.self).path(forResource: "GTMWebKit.bundle/html.bundle/neterror", ofType: "html")!
-    }
-    
     // MARK: - 通用属性
-    public var webView: GTMWebViewShell?
+    public var webView: WKWebView!
     public var isShowCloseItem = true   // 是否显示关闭按钮（navigType == .navbar 时使用）
     public var isShowToolbar = true     // 是否显示工具栏（navigType == .toolbar 时使用）
-    public var isForceUIWebView = false    // 强制使用 UIWebView
     public var isNeedShareCookies = false   // 是否需要共享cookies
     public var isUseWebTitle = true        // 是否使用网页的title
-    public var isNeverSetNavbarItems = false  // 是否设置BarButtonItems
-    public var backIconName: String?      // 返回按钮图标
+    public var backIconName: String?            // 返回按钮图标，可自行设置
+    public var view404: GTMWebErrorView!            // 资源不存在的时候展示的UI，可自定义
+    public var netErrorView: GTMWebErrorView!   // 网络错误的时候展示的UI，可自定义
     
-    public var isUseWKWebView: Bool {
-        if isForceUIWebView {
-            return false
-        } else {
-            if isNeedShareCookies {
-                if #available(iOS 11.0, *) {
-                    return true
-                } else {
-                    return false
-                }
-            } else {
-                if #available(iOS 8.0, *) {
-                    return true
-                } else {
-                    return false
-                }
-            }
-        }
-    }
     
     // Private props
     private var webUrl: URL?
     /// 网页加载进度指示器
     var progressView: UIProgressView?
     
-     var navigType: GTMWK_NavigationType! // 控制网页导航的方式（导航栏，工具栏）
+    private var navigType: GTMWK_NavigationType        // 控制网页导航的方式（导航栏，工具栏）
     // MARK: Navigation Items
-     var navbarItemBack: UIBarButtonItem?
-     var navbarItemClose: UIBarButtonItem?
+    var navbarItemBack: UIBarButtonItem?
+    var navbarItemClose: UIBarButtonItem?
     // MARK: ToolBar Items
-     var toolbarItemBack: UIBarButtonItem?
-     var toolbarItemForward: UIBarButtonItem?
-     var toolbarItemRefresh: UIBarButtonItem?
-     var toolbarItemAction: UIBarButtonItem?
+    var toolbarItemBack: UIBarButtonItem?
+    var toolbarItemForward: UIBarButtonItem?
+    var toolbarItemRefresh: UIBarButtonItem?
+    var toolbarItemAction: UIBarButtonItem?
     
     
     // MARK: - WKWebView 属性
@@ -82,23 +55,18 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
     var scriptHandlers: [String: (_ body: Any?) -> Void] = [:]
     // Cookies处理属性
     public static let sharedProcessPool = WKProcessPool()
-    
-    
-    // MARK: - UIWebView 属性
-    public var isSwipingBack: Bool = false      // 滑动状态标记
-    public var snapshotVs: [UIView] = []
-    public var currentSnapshotV: UIView?
-    public var previousSnapshotV: UIView?
-    var progresser: GTMWebViewProgress?
+
     
     // MARK: - Life Cycle
     
     var urlCovertible: URLConvertible?
     public init(with url: URLConvertible, navigType type: GTMWK_NavigationType) {
+        self.navigType = type
         super.init(nibName: nil, bundle: nil)
         self.urlCovertible = url
         self.webUrl = url.url()
-        self.navigType = type
+        self.view404 = GTMWebNetErrorView("404")
+        self.netErrorView = GTMWebNetErrorView("nosingle")
     }
     
     /// 如果当前不在根页面，回到并重新加载根页面。否则什么都不做
@@ -106,7 +74,7 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
         guard let url = self.urlCovertible?.url() else {
             return false
         }
-        if self.webView?.gtm_url?.absoluteString == url.absoluteString {
+        if self.webView.url!.absoluteString == url.absoluteString {
             return false
         }
         self.loadWithUrl(url: url)
@@ -114,7 +82,7 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
     }
     /// reload当前页面
     public func reload() {
-        self.webView?.gtm_reload()
+        self.webView.reload()
     }
     
     public required init?(coder aDecoder: NSCoder) {
@@ -131,15 +99,27 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
     override open func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        if self.isShowToolbar && self.navigType == .toolbar {
+        switch navigType {
+        case .navbar:
+            self.navigationController?.setToolbarHidden(true, animated: animated)
+        case .toolbar:
+            self.navigationController?.setNavigationBarHidden(false, animated: animated)
             self.navigationController?.setToolbarHidden(false, animated: animated)
+        case .both:
+            self.navigationController?.setToolbarHidden(false, animated: animated)
+            self.navigationController?.setNavigationBarHidden(false, animated: animated)
+        case .none:
+            self.navigationController?.setToolbarHidden(true, animated: animated)
+            self.navigationController?.setNavigationBarHidden(true, animated: animated)
         }
+//
         self.updateButtonItems() // 更新导航按钮状态
     }
     
     override open func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         self.navigationController?.setToolbarHidden(true, animated: animated)
+        self.navigationController?.setNavigationBarHidden(false, animated: animated)
     }
     
     private func setup() {
@@ -149,22 +129,13 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
         /// init sub views
         
         // web view
-        if self.isUseWKWebView {
-            // iOS 11 以上系统 使用 WKWebView (因为只有iOS11+中WKWebView才能彻底共享Cookies，所以只在这种情况使用WKWebView)
-            // 因为iOS的更新率比较高， 所以很快大多数设备都能用上 WKWebView
-            self.setupWkWebView()
-        } else {
-            // iOS 11 以下的系统还是使用UIWebView (UIWebView不需要做任何处理就能跟原生代码共享Cookies)
-            self.setupUiWebView()
-        }
+        self.setupWkWebView()
         
         self.addObservers() // KVO
         
         // progress view
         self.progressView = UIProgressView(progressViewStyle: .default)
         self.progressView?.frame = self.view.bounds
-//        let top = self.navigationController?.navigationBar.bounds.size.height ?? 0
-//        self.progressView?.frame.origin.y = top > 0 ? top + CGFloat(20) : 0
         self.progressView?.trackTintColor = UIColor.white
         self.progressView?.tintColor = UIColor.gray
         self.view.addSubview(self.progressView!)
@@ -183,9 +154,6 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
     
     deinit {
         self.removeObservers()
-        if !self.isUseWKWebView {
-            self.progresser = nil
-        }
         println("GTMWebViewController deinit")
     }
     
@@ -196,9 +164,9 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
         self.scriptHandlers[methodName] = handler
     }
     /// 注入JS
-//    public func injectUserScript(script: WKUserScript) {
-//        self.webView?.configuration.userContentController.addUserScript(script)
-//    }
+    public func injectUserScript(script: WKUserScript) {
+        self.webView.configuration.userContentController.addUserScript(script)
+    }
     
     // MARK: - Private
     func loadWebPage() {
@@ -211,37 +179,45 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
     }
     
     func loadWithUrl(url: URL) {
-        webView?.gtm_load(URLRequest.init(url: url))
+        webView.load(URLRequest(url: url))
     }
     
     // MARK: - 钩子函数
     // web加载完成(相当于抽象函数)
     open func webWillLoad() { }
-    open func webDidLoad() { }
+    open func webDidLoad() {
+        self.view404.removeFromSuperview()
+        self.netErrorView.removeFromSuperview()
+    }
     // 错误处理
     open func webDidLoadFail(error: NSError) {
-        if error.code == NSURLErrorCannotFindHost {
-            self.loadWithUrl(url: URL.init(fileURLWithPath: self.GTMWK_404_NOT_FOUND_HTML_PATH))
+        self.view404.removeFromSuperview()
+        self.netErrorView.removeFromSuperview()
+    
+        if error.code == NSURLErrorCannotFindHost ||
+            error.code == NSURLErrorCannotConnectToHost ||
+            error.code == NSURLErrorResourceUnavailable {
+            view404.reloadHandler = { [weak self] in
+                self?.loadWebPage()
+            }
+            self.view.addSubview(view404)
         } else {
-            self.loadWithUrl(url: URL.init(fileURLWithPath: self.GTMWK_NET_ERROR_HTML_PATH))
+            netErrorView.reloadHandler = { [weak self] in
+                self?.loadWebPage()
+            }
+            self.view.addSubview(netErrorView)
         }
     }
     
     // MARK: - KVO
     func addObservers() {
-        if self.isUseWKWebView {
-            self.wkwebv_addObservers()
-        }
+        self.wkwebv_addObservers()
     }
     func removeObservers() {
-        if self.isUseWKWebView {
-            self.wkwebv_removeObservers()
-        }
+        self.wkwebv_removeObservers()
     }
     open override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if self.isUseWKWebView {
-            self.wkwebv_observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
-        }
+        self.wkwebv_observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
     }
     
 }
@@ -250,76 +226,23 @@ extension GTMWebViewController {
     // MARK: - Web Navigation Items
     
     fileprivate func initButtonItems() {
-        guard isNeverSetNavbarItems == false else {
-            return
+   
+        switch navigType {
+        case .navbar:
+            self.initNavigationBarItems()
+        case .toolbar:
+            self.initBottomBarItems()
+        case .both:
+            self.initNavigationBarItems()
+            self.initBottomBarItems()
+        case .none:
+            break
         }
-        let bundle = self.sourceBundle
-        
-        // back button
-        var iconBack = UIImage.init(named: "back", in: bundle, compatibleWith: nil)
-        if let image = self.navigationController?.navigationBar.backIndicatorImage {
-            iconBack = image
-        }
-        let buttonBack = UIButton.init(type: .custom)
-        buttonBack.setImage(iconBack, for: .normal)
-        buttonBack.frame = CGRect(x: 0, y: 0, width: 20, height: 44)
-        if #available(iOS 11.0, *) {
-            buttonBack.imageEdgeInsets = UIEdgeInsets(top: 12, left: 4, bottom: 12, right: 4)
-        } else {
-            buttonBack.imageEdgeInsets = UIEdgeInsets(top: 12, left: -8, bottom: 12, right: 8)
-        }
-        
-        if navigType == .navbar {
-            if let backIcon = backIconName {
-                iconBack = UIImage(named: backIcon)
-                buttonBack.setImage(iconBack, for: .normal)
-            }
-            // back item
-            buttonBack.addTarget(self, action: #selector(onNavigationBack), for: .touchUpInside)
-            self.navbarItemBack = UIBarButtonItem.init(customView: buttonBack)
-            // close item
-            let title = NSLocalizedString("close", bundle: bundle, comment: "")
-            let closeButton = UIButton.init(type: .custom)
-            closeButton.setTitle(title, for: .normal)
-            closeButton.titleLabel?.font = UIFont.systemFont(ofSize: 15)
-            closeButton.setTitleColor(self.navigationController?.navigationBar.tintColor, for: .normal)
-            closeButton.frame = CGRect(x: 0, y: 0, width: 40, height: 44)
-            if #available(iOS 11.0, *) {
-                closeButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: -10, bottom: 0, right: 10)
-            } else {
-                closeButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: -5, bottom: 0, right: 5)
-            }
-           
-            closeButton.addTarget(self, action: #selector(onNavigationClose), for: .touchUpInside)
-            self.navbarItemClose = UIBarButtonItem.init(customView: closeButton)
-        } else {
-            // back item
-            buttonBack.addTarget(self, action: #selector(onToolbarBack), for: .touchUpInside)
-            self.toolbarItemBack = UIBarButtonItem.init(customView: buttonBack)
-            // forward item
-            let iconForward = UIImage.init(named: "forward", in: bundle, compatibleWith: nil)
-            let buttonForward = UIButton.init(type: .custom)
-            buttonForward.setImage(iconForward, for: .normal)
-            buttonForward.frame = CGRect(x: 0, y: 0, width: 20, height: 44)
-            if #available(iOS 11.0, *) {
-                buttonForward.imageEdgeInsets = UIEdgeInsets(top: 12, left: 4, bottom: 12, right: 4)
-            } else {
-                buttonForward.imageEdgeInsets = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
-            }
-            buttonForward.addTarget(self, action: #selector(onToolbarForward), for: .touchUpInside)
-            self.toolbarItemForward = UIBarButtonItem.init(customView: buttonForward)
-            // refresh item
-            self.toolbarItemRefresh = UIBarButtonItem.init(barButtonSystemItem: .refresh, target: self, action: #selector(onToolbarRefresh))
-            // action item
-            self.toolbarItemAction = UIBarButtonItem.init(barButtonSystemItem: .action, target: self, action: #selector(onToolbarAction))
-        }
-        
-        
         // done
         if let navigationC = self.navigationController {
             if navigationC.isBeingPresented {
                 // done item
-                let title = NSLocalizedString("done", bundle: bundle, comment: "")
+                let title = NSLocalizedString("done", bundle: self.sourceBundle, comment: "")
                 let doneButton = UIButton.init(type: .custom)
                 doneButton.frame = CGRect(x: 0, y: 0, width: 40, height: 44)
                 doneButton.setTitle(title, for: .normal)
@@ -330,6 +253,8 @@ extension GTMWebViewController {
                 self.navigationItem.rightBarButtonItem = doneButtonItem
             }
         }
+        // 更新状态
+        self.updateButtonItems()
     }
     
     // MARK: - Navigation Events
@@ -339,7 +264,7 @@ extension GTMWebViewController {
     }
     
     @objc func onNavigationBack() {
-        if webView!.gtm_canGoBacK {
+        if webView.canGoBack {
             self.onWebpageBack()
         } else {
             self.navigationController?.popViewController(animated: true)
@@ -354,76 +279,162 @@ extension GTMWebViewController {
         self.onWebpageBack()
     }
     @objc func onToolbarForward() {
-        webView?.gtm_goForward()
+        webView.goForward()
     }
     @objc func onToolbarRefresh() {
-        webView?.gtm_reload()
+        webView.reload()
     }
     @objc func onToolbarAction() {
-        if let url = webView?.gtm_url {
+        if let url = webView.url {
             let activityVC = UIActivityViewController.init(activityItems: [url], applicationActivities: nil)
             self.present(activityVC, animated: true, completion: nil)
         }
     }
     
     func onWebpageBack() {
-        webView?.gtm_goBack()
-        if !self.isUseWKWebView {
-            self.popSnapShotView()
-            
-            if isUseWebTitle {
-                let time: TimeInterval = 1.0
-                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + time) {
-                    self.title = self.webView?.web_title
-                }
-            }
-            
-            self.updateButtonItems()
-        }
+        webView.goBack()
+        self.updateButtonItems()
     }
     
-    // MARK: Update Items
+    // MARK: Navigation Items
     
-    func updateButtonItems() {
-        guard isNeverSetNavbarItems == false else {
-            return
+    private func initNavigationBarItems() {
+        let bundle = sourceBundle
+        var iconBack = UIImage.init(named: "nav_back", in: bundle, compatibleWith: nil)
+        if let image = self.navigationController?.navigationBar.backIndicatorImage {
+            iconBack = image
+        }
+        let buttonBack = UIButton.init(type: .custom)
+        buttonBack.setImage(iconBack, for: .normal)
+        buttonBack.sizeToFit()
+//        buttonBack.frame = CGRect(x: 0, y: 0, width: 20, height: 44)
+//        if #available(iOS 11.0, *) {
+//            buttonBack.imageEdgeInsets = UIEdgeInsets(top: 12, left: 4, bottom: 12, right: 4)
+//        } else {
+//            buttonBack.imageEdgeInsets = UIEdgeInsets(top: 12, left: -8, bottom: 12, right: 8)
+//        }
+        
+        if let backIcon = backIconName {
+            iconBack = UIImage(named: backIcon)
+            buttonBack.setImage(iconBack, for: .normal)
+        }
+        // back item
+        buttonBack.addTarget(self, action: #selector(onNavigationBack), for: .touchUpInside)
+        self.navbarItemBack = UIBarButtonItem.init(customView: buttonBack)
+       // self.navigationItem.setLeftBarButtonItems([self.navbarItemBack!], animated: false)
+        
+        // close item
+        let title = NSLocalizedString("close", bundle: bundle, comment: "")
+        let closeButton = UIButton.init(type: .custom)
+        closeButton.setTitle(title, for: .normal)
+        closeButton.titleLabel?.font = UIFont.systemFont(ofSize: 15)
+        closeButton.setTitleColor(self.navigationController?.navigationBar.tintColor, for: .normal)
+        closeButton.frame = CGRect(x: 0, y: 0, width: 40, height: 44)
+        if #available(iOS 11.0, *) {
+            closeButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: -10, bottom: 0, right: 10)
+        } else {
+            closeButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: -5, bottom: 0, right: 5)
         }
         
-        if navigType == .navbar {
-            self.updateNavbarButtonItems()
+        closeButton.addTarget(self, action: #selector(onNavigationClose), for: .touchUpInside)
+        self.navbarItemClose = UIBarButtonItem.init(customView: closeButton)
+    }
+    private func initBottomBarItems() {
+        let bundle = sourceBundle
+        var iconBack = UIImage.init(named: "back", in: bundle, compatibleWith: nil)
+        if let image = self.navigationController?.navigationBar.backIndicatorImage {
+            iconBack = image
+        }
+        let buttonBack = UIButton.init(type: .system)
+        buttonBack.setImage(iconBack, for: .normal)
+        buttonBack.sizeToFit()
+        buttonBack.frame = CGRect(x: 0, y: 0, width: 20, height: 44)
+        if #available(iOS 11.0, *) {
+            buttonBack.imageEdgeInsets = UIEdgeInsets(top: 12, left: 4, bottom: 12, right: 4)
         } else {
+            buttonBack.imageEdgeInsets = UIEdgeInsets(top: 12, left: -8, bottom: 12, right: 8)
+        }
+        // back item
+        buttonBack.addTarget(self, action: #selector(onToolbarBack), for: .touchUpInside)
+        self.toolbarItemBack = UIBarButtonItem.init(customView: buttonBack)
+        // forward item
+        let iconForward = UIImage.init(named: "forward", in: bundle, compatibleWith: nil)
+        let buttonForward = UIButton.init(type: .custom)
+        buttonForward.setImage(iconForward, for: .normal)
+        buttonForward.frame = CGRect(x: 0, y: 0, width: 20, height: 44)
+        if #available(iOS 11.0, *) {
+            buttonForward.imageEdgeInsets = UIEdgeInsets(top: 12, left: 4, bottom: 12, right: 4)
+        } else {
+            buttonForward.imageEdgeInsets = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
+        }
+        buttonForward.addTarget(self, action: #selector(onToolbarForward), for: .touchUpInside)
+        self.toolbarItemForward = UIBarButtonItem.init(customView: buttonForward)
+        // refresh item
+        self.toolbarItemRefresh = UIBarButtonItem.init(barButtonSystemItem: .refresh, target: self, action: #selector(onToolbarRefresh))
+        // action item
+        self.toolbarItemAction = UIBarButtonItem.init(barButtonSystemItem: .action, target: self, action: #selector(onToolbarAction))
+    }
+    
+    func updateButtonItems() {
+        switch navigType {
+        case .navbar:
+            self.updateNavbarButtonItems()
+        case .toolbar:
             self.updateToolbarButtonItems()
+        case .both:
+            self.updateNavbarButtonItems()
+            self.updateToolbarButtonItems()
+        default:
+            break
         }
     }
-    func updateNavbarButtonItems() {
+    private func updateNavbarButtonItems() {
         self.navigationItem.setLeftBarButtonItems(nil, animated: false)
-        if webView!.gtm_canGoBacK {
+        if webView.canGoBack {
             self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
             if let navigC = self.navigationController {
+                var items: [UIBarButtonItem] = self.navigationItem.leftBarButtonItems ?? []
                 if navigC.viewControllers.count > 1 {
                     if self.isShowCloseItem {
-                        self.navigationItem.setLeftBarButtonItems([self.navbarItemBack!, self.navbarItemClose!], animated: false)
+                        items.insert(self.navbarItemBack!, at: 0)
+                        items.append(self.navbarItemClose!)
+                        self.navigationItem.setLeftBarButtonItems(items, animated: false)
                     } else {
-                        self.navigationItem.setLeftBarButtonItems([self.navbarItemBack!], animated: false)
+                        for (i, item) in items.enumerated() {
+                            if item == self.navbarItemClose! {
+                                items.remove(at: i)
+                            }
+                        }
+                        self.navigationItem.setLeftBarButtonItems(items, animated: false)
                     }
                 } else {
                     if self.isShowCloseItem {
-                        self.navigationItem.setLeftBarButtonItems([self.navbarItemClose!], animated: false)
+                        items.insert(self.navbarItemBack!, at: 0)
+                        items.append(self.navbarItemClose!)
+                        self.navigationItem.setLeftBarButtonItems(items, animated: false)
                     } else {
-                        self.navigationItem.setLeftBarButtonItems(nil, animated: false)
+                        for (i, item) in items.enumerated() {
+                            if item == self.navbarItemClose! {
+                                items.remove(at: i)
+                            }
+                        }
+                        self.navigationItem.setLeftBarButtonItems(items, animated: false)
                     }
                 }
             }
         } else {
-            self.navigationItem.setLeftBarButtonItems(nil, animated: false)
+            var items: [UIBarButtonItem] = self.navigationItem.leftBarButtonItems ?? []
+            items.insert(self.navbarItemBack!, at: 0)
+            self.navigationItem.setLeftBarButtonItems(items, animated: false)
+           // self.navigationItem.setLeftBarButtonItems(nil, animated: false)
             self.navigationController?.interactivePopGestureRecognizer?.delegate = nil
             self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
         }
     }
-    func updateToolbarButtonItems() {
-        self.toolbarItemBack?.isEnabled = webView!.gtm_canGoBacK
-        self.toolbarItemForward?.isEnabled = webView!.gtm_canGoForward
-        self.toolbarItemAction?.isEnabled = !webView!.gtm_isLoading
+    private func updateToolbarButtonItems() {
+        self.toolbarItemBack?.isEnabled = webView.canGoBack
+        self.toolbarItemForward?.isEnabled = webView.canGoForward
+        self.toolbarItemAction?.isEnabled = !webView.isLoading
         
         let space = UIBarButtonItem.init(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         let items = [self.toolbarItemBack!, space, self.toolbarItemForward!, space, self.toolbarItemRefresh!, space, self.toolbarItemAction!]

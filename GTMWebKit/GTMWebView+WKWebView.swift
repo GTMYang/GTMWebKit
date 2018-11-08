@@ -13,7 +13,7 @@ import WebKit
 extension GTMWebViewController: WKNavigationDelegate {
     
     public var wkWebView: WKWebView? {
-        return self.webView as? WKWebView
+        return self.webView
     }
     
     func setupWkWebView() {
@@ -23,7 +23,7 @@ extension GTMWebViewController: WKNavigationDelegate {
         
         let configuration = WKWebViewConfiguration()    // 配置
         configuration.processPool = GTMWebViewController.sharedProcessPool // WkWebView 实例间共享Cookies
-        configuration.preferences.minimumFontSize = 10
+        configuration.preferences.minimumFontSize = 1
         configuration.preferences.javaScriptEnabled = true
         configuration.allowsInlineMediaPlayback = true  // 允许视频播放回退
         configuration.userContentController = WKUserContentController()     // 交互对象
@@ -55,7 +55,7 @@ extension GTMWebViewController: WKNavigationDelegate {
             println("loading")
         } else if keyPath == "title" {
             if isUseWebTitle {
-                self.title = self.webView?.web_title
+                self.title = self.webView.title
             }
             self.updateButtonItems() // 更新导航按钮状态
         } else if keyPath == "estimatedProgress" {
@@ -81,7 +81,7 @@ extension GTMWebViewController: WKNavigationDelegate {
     // MARK: Responding to Server Actions
     public func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
         
-        print(navigation.description)
+        println(navigation.description)
     }
     // Authentication Challenges
     public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
@@ -157,16 +157,7 @@ extension GTMWebViewController: WKNavigationDelegate {
             }
         }
         
-        if let url = navigationAction.request.url?.absoluteString {
-            if url.hasSuffix(GTMWK_NET_ERROR_RELOAD_URL) || url.hasSuffix(GTMWK_404_NOT_FOUND_RELOAD_URL) {
-                self.loadWebPage()
-                println("do reload the web page")
-                decisionHandler(.cancel)
-                return
-            }
-        }
-        
-        //        self.updateButtonItems() // 更新导航按钮状态
+        self.updateButtonItems() // 更新导航按钮状态
         decisionHandler(.allow)
     }
     public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
@@ -197,8 +188,8 @@ extension GTMWebViewController: WKScriptMessageHandler {
         if message.name == "GTMWebKitAPI" {
             if let body = message.body as? Dictionary<String, Any> {
                 let method = body["method"] as! String
-                print("\(body)")
-                print("\(method)")
+                println("\(body)")
+                println("\(method)")
                 
                 if let handler = self.scriptHandlers[method] {
                     handler(body["body"])

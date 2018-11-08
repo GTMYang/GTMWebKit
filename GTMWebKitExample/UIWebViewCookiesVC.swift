@@ -64,7 +64,7 @@ class UIWebViewCookiesVC: GTMWebViewController {
 //            let dataStore = self.wkWebView?.configuration.websiteDataStore
             dataStore.httpCookieStore.getAllCookies({ (cookies) in
                 let selfCookies = cookies.filter({ (cookie) -> Bool in
-                    return cookie.domain == self.webView!.gtm_url!.host
+                    return cookie.domain == self.webView!.url!.host
                 })
                 self.showCookies(selfCookies)
             })
@@ -74,10 +74,10 @@ class UIWebViewCookiesVC: GTMWebViewController {
     @objc func onCallNativeCookies() {
         // UIWebView 获取Cookies
         let cookiesStorage = HTTPCookieStorage.shared
-        let cookies = cookiesStorage.cookies(for: webView!.gtm_url!)
+        let cookies = cookiesStorage.cookies(for: webView.url!)
         
         let selfCookies = cookies!.filter({ (cookie) -> Bool in
-            return cookie.domain == self.webView!.gtm_url!.host
+            return cookie.domain == self.webView!.url!.host
         })
         
         self.showCookies(selfCookies)
