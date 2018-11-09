@@ -89,11 +89,16 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
         fatalError("init(coder:) has not been implemented")
     }
     
+    var originToolBarState: Bool?
+    var originNavBarState: Bool?
     override open func viewDidLoad() {
         super.viewDidLoad()
 
         self.setup()
         self.loadWebPage()     // 加载网页
+        
+        originToolBarState = self.navigationController?.isToolbarHidden
+        originNavBarState = self.navigationController?.isNavigationBarHidden
     }
     
     override open func viewWillAppear(_ animated: Bool) {
@@ -118,8 +123,11 @@ open class GTMWebViewController: UIViewController, GTMAlertable {
     
     override open func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        self.navigationController?.setToolbarHidden(true, animated: animated)
-        self.navigationController?.setNavigationBarHidden(false, animated: animated)
+        guard originNavBarState != nil else {
+            return
+        }
+        self.navigationController?.setToolbarHidden(originToolBarState!, animated: animated)
+        self.navigationController?.setNavigationBarHidden(originNavBarState!, animated: animated)
     }
     
     private func setup() {
